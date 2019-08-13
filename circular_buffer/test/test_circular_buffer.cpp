@@ -6,6 +6,34 @@ namespace
 
 class CircularBufferTest : public ::testing::Test {};
 
+TEST_F(CircularBufferTest, subscript_operator)
+{
+    {
+        simple_circular_buffer<int> scb(3);
+
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+        scb.push_back(3);
+
+        EXPECT_EQ(1, scb[0]);
+        EXPECT_EQ(2, scb[1]);
+        EXPECT_EQ(3, scb[2]);
+    }
+    {
+        simple_circular_buffer<int> scb(3);
+
+        scb.push_front(0);
+        scb.push_front(1);
+        scb.push_front(2);
+        scb.push_front(3);
+
+        EXPECT_EQ(3, scb[0]);
+        EXPECT_EQ(2, scb[1]);
+        EXPECT_EQ(1, scb[2]);
+    }
+}
+
 TEST_F(CircularBufferTest, front)
 {
     {
@@ -370,6 +398,36 @@ TEST_F(CircularBufferTest, const_iterator)
 
 
 class ConstCircularBufferTest : public ::testing::Test {};
+
+TEST_F(ConstCircularBufferTest, subscript_operator)
+{
+    {
+        simple_circular_buffer<int> scb(3);
+        const auto& c_scb = scb;
+
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+        scb.push_back(3);
+
+        EXPECT_EQ(1, c_scb[0]);
+        EXPECT_EQ(2, c_scb[1]);
+        EXPECT_EQ(3, c_scb[2]);
+    }
+    {
+        simple_circular_buffer<int> scb(3);
+        const auto& c_scb = scb;
+
+        scb.push_front(0);
+        scb.push_front(1);
+        scb.push_front(2);
+        scb.push_front(3);
+
+        EXPECT_EQ(3, c_scb[0]);
+        EXPECT_EQ(2, c_scb[1]);
+        EXPECT_EQ(1, c_scb[2]);
+    }
+}
 
 TEST_F(ConstCircularBufferTest, front)
 {
