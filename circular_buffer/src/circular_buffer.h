@@ -325,7 +325,7 @@ template<typename U>
 std::enable_if_t<std::is_move_constructible<U>::value, void>
 simple_circular_buffer<T>::push_front(value_type&& item)
 {
-    push_front_fwd(item);
+    push_front_fwd(std::move(item));
 }
 
 template<typename T>
@@ -360,7 +360,7 @@ template<typename U>
 std::enable_if_t<std::is_move_constructible<U>::value, void>
 simple_circular_buffer<T>::push_back(value_type&& item)
 {
-    push_back_fwd(item);
+    push_back_fwd(std::move(item));
 }
 
 template<typename T>
