@@ -54,6 +54,7 @@ endif()
 ### Examples
 set(examples
     "00_example"
+    "circular_buffer"
     # Add a new example here.
 )
 
