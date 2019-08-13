@@ -173,8 +173,21 @@ public:
         contents_size_ = 0;
     }
 
-    void push_front(const_reference item);
-    void push_back(const_reference item);
+    template<typename U = T>
+    std::enable_if_t<std::is_copy_constructible<U>::value, void>
+    push_front(const_reference item);
+
+    template<typename U = T>
+    std::enable_if_t<std::is_move_constructible<U>::value, void>
+    push_front(value_type&& item);
+
+    template<typename U = T>
+    std::enable_if_t<std::is_copy_constructible<U>::value, void>
+    push_back(const_reference item);
+
+    template<typename U = T>
+    std::enable_if_t<std::is_move_constructible<U>::value, void>
+    push_back(value_type&& item);
 
     void pop_front();
     void pop_back();
@@ -211,6 +224,12 @@ public:
     const_iterator cend() const { return end(); }
 
 private:
+    template<typename U>
+    void push_front_fwd(U&& item);
+
+    template<typename U>
+    void push_back_fwd(U&& item);
+
     pointer _begin();
     const_pointer _begin() const;
 
@@ -294,12 +313,29 @@ simple_circular_buffer<T>::back() const
 }
 
 template<typename T>
-void simple_circular_buffer<T>::push_front(const_reference item)
+template<typename U>
+std::enable_if_t<std::is_copy_constructible<U>::value, void>
+simple_circular_buffer<T>::push_front(const_reference item)
+{
+    push_front_fwd(item);
+}
+
+template<typename T>
+template<typename U>
+std::enable_if_t<std::is_move_constructible<U>::value, void>
+simple_circular_buffer<T>::push_front(value_type&& item)
+{
+    push_front_fwd(item);
+}
+
+template<typename T>
+template<typename U>
+void simple_circular_buffer<T>::push_front_fwd(U&& item)
 {
     const auto cap = capacity();
 
     head_ = (head_ > 0)? head_ - 1 : cap - 1;
-    array_[head_] = item;
+    array_[head_] = std::forward<U>(item);
 
     if(contents_size_ < cap)
     {
@@ -312,11 +348,28 @@ void simple_circular_buffer<T>::push_front(const_reference item)
 }
 
 template<typename T>
-void simple_circular_buffer<T>::push_back(const_reference item)
+template<typename U>
+std::enable_if_t<std::is_copy_constructible<U>::value, void>
+simple_circular_buffer<T>::push_back(const_reference item)
+{
+    push_back_fwd(item);
+}
+
+template<typename T>
+template<typename U>
+std::enable_if_t<std::is_move_constructible<U>::value, void>
+simple_circular_buffer<T>::push_back(value_type&& item)
+{
+    push_back_fwd(item);
+}
+
+template<typename T>
+template<typename U>
+void simple_circular_buffer<T>::push_back_fwd(U&& item)
 {
     const auto cap = capacity();
 
-    array_[tail_] = item;
+    array_[tail_] = std::forward<U>(item);
     tail_ = (tail_ < (cap - 1))? tail_ + 1 : 0;
 
     if(contents_size_ < cap)
