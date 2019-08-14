@@ -15,7 +15,7 @@ public:
     using value_type        = T;
     using pointer           = const T*;
     using reference         = const T&;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using _Tptr = T*;
 
     _scb_const_iterator() = delete;
@@ -40,14 +40,39 @@ public:
 
     _scb_const_iterator& operator++()
     {
+        assert(ptr_ != cb_->buffer_end());
+
         ptr_ = const_cast<_Tptr>(cb_->increment(ptr_));
+
+        if(ptr_ == cb_->buffer_begin())
+            ptr_ = const_cast<_Tptr>(cb_->buffer_end());
+
         return *this;
     }
 
     _scb_const_iterator operator++(int)
     {
         _scb_const_iterator temp = *this;
-        ptr_ = const_cast<_Tptr>(cb_->increment(ptr_));
+        ++(*this);
+        return temp;
+    }
+
+    _scb_const_iterator& operator--()
+    {
+        assert(ptr_ != cb_->buffer_begin());
+
+        if(ptr_ == cb_->array_end())
+            ptr_ = const_cast<_Tptr>(cb_->buffer_begin());
+
+        ptr_ = const_cast<_Tptr>(cb_->decrement(ptr_));
+
+        return *this;
+    }
+
+    _scb_const_iterator operator--(int)
+    {
+        _scb_const_iterator temp = *this;
+        --(*this);
         return temp;
     }
 
@@ -74,7 +99,7 @@ public:
     using value_type        = T;
     using pointer           = T*;
     using reference         = T&;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
 
     _scb_iterator() = delete;
     _scb_iterator(const _scb_iterator&) = default;
@@ -98,14 +123,39 @@ public:
 
     _scb_iterator& operator++()
     {
+        assert(ptr_ != cb_->buffer_end());
+
         ptr_ = const_cast<pointer>(cb_->increment(ptr_));
+
+        if(ptr_ == cb_->buffer_begin())
+            ptr_ = const_cast<pointer>(cb_->buffer_end());
+
         return *this;
     }
 
     _scb_iterator operator++(int)
     {
         _scb_iterator temp = *this;
-        ptr_ = const_cast<pointer>(cb_->increment(ptr_));
+        ++(*this);
+        return temp;
+    }
+
+    _scb_iterator& operator--()
+    {
+        assert(ptr_ != cb_->buffer_begin());
+
+        if(ptr_ == cb_->array_end())
+            ptr_ = const_cast<pointer>(cb_->buffer_begin());
+
+        ptr_ = const_cast<pointer>(cb_->decrement(ptr_));
+
+        return *this;
+    }
+
+    _scb_iterator operator--(int)
+    {
+        _scb_iterator temp = *this;
+        --(*this);
         return temp;
     }
 
@@ -166,12 +216,7 @@ public:
     reference back();
     const_reference back() const;
 
-    void clear() noexcept
-    {
-        head_ = 0;
-        tail_ = 0;
-        contents_size_ = 0;
-    }
+    void clear() noexcept;
 
     template<typename U = T>
     std::enable_if_t<std::is_copy_constructible<U>::value, void>
@@ -214,11 +259,11 @@ public:
     bool is_linearized() const;
     void linearize();
 
-    iterator begin(){ return iterator(this, _begin()); }
-    const_iterator begin() const { return const_iterator(this, const_cast<pointer>(_begin())); }
+    iterator begin(){ return iterator(this, buffer_begin()); }
+    const_iterator begin() const { return const_iterator(this, const_cast<pointer>(buffer_begin())); }
 
-    iterator end(){ return iterator(this, _end()); }
-    const_iterator end() const { return const_iterator(this, const_cast<pointer>(_end())); }
+    iterator end(){ return iterator(this, buffer_end()); }
+    const_iterator end() const { return const_iterator(this, const_cast<pointer>(buffer_end())); }
 
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
@@ -230,14 +275,23 @@ private:
     template<typename U>
     void push_back_fwd(U&& item);
 
-    pointer _begin();
-    const_pointer _begin() const;
+    pointer array_begin();
+    const_pointer array_begin() const;
 
-    pointer _end();
-    const_pointer _end() const;
+    pointer array_end();
+    const_pointer array_end() const;
+
+    pointer buffer_begin();
+    const_pointer buffer_begin() const;
+
+    pointer buffer_end();
+    const_pointer buffer_end() const;
 
     pointer increment(const_pointer ptr);
     const_pointer increment(const_pointer ptr) const;
+
+    pointer decrement(const_pointer ptr);
+    const_pointer decrement(const_pointer ptr) const;
 
 private:
     std::vector<value_type> array_;
@@ -313,6 +367,14 @@ simple_circular_buffer<T>::back() const
 }
 
 template<typename T>
+void simple_circular_buffer<T>::clear() noexcept
+{
+    head_ = 0;
+    tail_ = 0;
+    contents_size_ = 0;
+}
+
+template<typename T>
 template<typename U>
 std::enable_if_t<std::is_copy_constructible<U>::value, void>
 simple_circular_buffer<T>::push_front(const_reference item)
@@ -339,7 +401,7 @@ void simple_circular_buffer<T>::push_front_fwd(U&& item)
 
     if(contents_size_ < cap)
     {
-        contents_size_++;
+        ++contents_size_;
     }
     else
     {
@@ -374,7 +436,7 @@ void simple_circular_buffer<T>::push_back_fwd(U&& item)
 
     if(contents_size_ < cap)
     {
-        contents_size_++;
+        ++contents_size_;
     }
     else
     {
@@ -387,7 +449,7 @@ void simple_circular_buffer<T>::pop_front()
 {
     assert(!is_empty());
     head_ = (head_ < (capacity() - 1))? head_ + 1 : 0;
-    contents_size_--;
+    --contents_size_;
 }
 
 template<typename T>
@@ -395,7 +457,7 @@ void simple_circular_buffer<T>::pop_back()
 {
     assert(!is_empty());
     tail_ = (tail_ > 0)? tail_ - 1 : capacity() - 1;
-    contents_size_--;
+    --contents_size_;
 }
 
 template<typename T>
@@ -454,40 +516,78 @@ void simple_circular_buffer<T>::linearize()
 
 template<typename T>
 typename simple_circular_buffer<T>::pointer
-simple_circular_buffer<T>::_begin()
+simple_circular_buffer<T>::array_begin()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto& temp = *this;
-    return const_cast<pointer>(temp._begin());
+    const auto & temp = *this;
+    return const_cast<pointer>(temp.array_begin());
 #else
-    return const_cast<pointer>(std::as_const(*this)._begin());
+    return const_cast<pointer>(std::as_const(*this).array_begin());
 #endif
 }
 
 template<typename T>
 typename simple_circular_buffer<T>::const_pointer
-simple_circular_buffer<T>::_begin() const
+simple_circular_buffer<T>::array_begin() const
+{
+    return array_.data();
+}
+
+template<typename T>
+typename simple_circular_buffer<T>::pointer
+simple_circular_buffer<T>::array_end()
+{
+#if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
+    const auto & temp = *this;
+    return const_cast<pointer>(temp.array_end());
+#else
+    return const_cast<pointer>(std::as_const(*this).array_end());
+#endif
+}
+
+template<typename T>
+typename simple_circular_buffer<T>::const_pointer
+simple_circular_buffer<T>::array_end() const
+{
+    return array_.data() + array_.size();
+}
+
+template<typename T>
+typename simple_circular_buffer<T>::pointer
+simple_circular_buffer<T>::buffer_begin()
+{
+#if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
+    const auto & temp = *this;
+    return const_cast<pointer>(temp.buffer_begin());
+#else
+    return const_cast<pointer>(std::as_const(*this).buffer_begin());
+#endif
+}
+
+template<typename T>
+typename simple_circular_buffer<T>::const_pointer
+simple_circular_buffer<T>::buffer_begin() const
 {
     return &array_[head_];
 }
 
 template<typename T>
 typename simple_circular_buffer<T>::pointer
-simple_circular_buffer<T>::_end()
+simple_circular_buffer<T>::buffer_end()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto& temp = *this;
-    return const_cast<pointer>(temp._end());
+    const auto & temp = *this;
+    return const_cast<pointer>(temp.buffer_end());
 #else
-    return const_cast<pointer>(std::as_const(*this)._end());
+    return const_cast<pointer>(std::as_const(*this).buffer_end());
 #endif
 }
 
 template<typename T>
 typename simple_circular_buffer<T>::const_pointer
-simple_circular_buffer<T>::_end() const
+simple_circular_buffer<T>::buffer_end() const
 {
-    return (is_full())? array_.data() + array_.size() : &array_[tail_];
+    return (is_full())? array_end() : &array_[tail_];
 }
 
 template<typename T>
@@ -506,19 +606,29 @@ template<typename T>
 typename simple_circular_buffer<T>::const_pointer
 simple_circular_buffer<T>::increment(const_pointer ptr) const
 {
-    assert(!is_empty());
+    if(++ptr == array_end())
+        ptr = array_begin();
+    return ptr;
+}
 
-    auto ar_interval = std::make_pair(array_.data(), array_.data() + array_.size());
-    auto it_interval = std::make_pair(_begin(), _end());
+template<typename T>
+typename simple_circular_buffer<T>::pointer
+simple_circular_buffer<T>::decrement(const_pointer ptr)
+{
+#if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
+    const auto & temp = *this;
+    return const_cast<pointer>(temp.decrement());
+#else
+    return const_cast<pointer>(std::as_const(*this).decrement());
+#endif
+}
 
-    assert(ptr != it_interval.second);
-    if(ptr == (ar_interval.second - 1))
-        ptr = ar_interval.first;
-    else
-        ptr++;
-
-    if((head_ == tail_) && (ptr == it_interval.first))
-        ptr = it_interval.second;
-
+template<typename T>
+typename simple_circular_buffer<T>::const_pointer
+simple_circular_buffer<T>::decrement(const_pointer ptr) const
+{
+    if(ptr == array_begin())
+        ptr = array_end();
+    --ptr;
     return ptr;
 }
