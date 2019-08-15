@@ -370,6 +370,58 @@ TEST_F(CircularBufferTest, const_iterator_bounds)
     }
 }
 
+TEST_F(CircularBufferTest, reverse_iterator_bounds)
+{
+    simple_circular_buffer<int> scb(3);
+
+    // empty
+    {
+        auto beg_iter = scb.rbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = scb.rend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+    // not empty
+    {
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+
+        auto beg_iter = scb.rbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = scb.rend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+}
+
+TEST_F(CircularBufferTest, const_reverse_iterator_bounds)
+{
+    simple_circular_buffer<int> scb(3);
+
+    // empty
+    {
+        auto beg_iter = scb.crbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = scb.crend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+    // not empty
+    {
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+
+        auto beg_iter = scb.crbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = scb.crend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+}
+
 TEST_F(CircularBufferTest, forward_iteration)
 {
     simple_circular_buffer<int> scb(3);
@@ -452,50 +504,78 @@ TEST_F(CircularBufferTest, backward_iteration)
 {
     simple_circular_buffer<int> scb(3);
 
-    scb.push_back(0);
-    scb.push_back(1);
-    auto it = scb.end();
+    // empty
+    {
+        int counter = 0;
+        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(0, counter);
+    }
+    // not empty
+    {
+        int counter = 0;
+        scb.push_back(0);
+        scb.push_back(1);
+        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(2, counter);
 
-    it--;
-    EXPECT_EQ(1, *it);
-    it--;
-    EXPECT_EQ(0, *it);
+        scb.push_back(2);
+        scb.push_back(3);
+        counter = 0;
+        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(3, counter);
+    }
+    //
+    {
+        auto it = scb.rbegin();
 
-    scb.push_back(2);
-    scb.push_back(3);
-    it = scb.end();
-
-    it--;
-    EXPECT_EQ(3, *it);
-    it--;
-    EXPECT_EQ(2, *it);
-    it--;
-    EXPECT_EQ(1, *it);
+        EXPECT_EQ(3, *it);
+        it++;
+        EXPECT_EQ(2, *it);
+        it++;
+        EXPECT_EQ(1, *it);
+    }
 }
 
 TEST_F(CircularBufferTest, backward_iteration_const)
 {
     simple_circular_buffer<int> scb(3);
 
-    scb.push_back(0);
-    scb.push_back(1);
-    auto it = scb.cend();
+    // empty
+    {
+        int counter = 0;
+        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(0, counter);
+    }
+    // not empty
+    {
+        int counter = 0;
+        scb.push_back(0);
+        scb.push_back(1);
+        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(2, counter);
 
-    it--;
-    EXPECT_EQ(1, *it);
-    it--;
-    EXPECT_EQ(0, *it);
+        scb.push_back(2);
+        scb.push_back(3);
+        counter = 0;
+        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(3, counter);
+    }
+    //
+    {
+        auto it = scb.crbegin();
 
-    scb.push_back(2);
-    scb.push_back(3);
-    it = scb.cend();
-
-    it--;
-    EXPECT_EQ(3, *it);
-    it--;
-    EXPECT_EQ(2, *it);
-    it--;
-    EXPECT_EQ(1, *it);
+        EXPECT_EQ(3, *it);
+        it++;
+        EXPECT_EQ(2, *it);
+        it++;
+        EXPECT_EQ(1, *it);
+    }
 }
 
 
@@ -859,6 +939,60 @@ TEST_F(ConstCircularBufferTest, const_iterator_bounds)
     }
 }
 
+TEST_F(ConstCircularBufferTest, reverse_iterator_bounds)
+{
+    simple_circular_buffer<int> scb(3);
+    const auto& c_scb = scb;
+
+    // empty
+    {
+        auto beg_iter = c_scb.rbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = c_scb.rend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+    // not empty
+    {
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+
+        auto beg_iter = c_scb.rbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = c_scb.rend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+}
+
+TEST_F(ConstCircularBufferTest, const_reverse_iterator_bounds)
+{
+    simple_circular_buffer<int> scb(3);
+    const auto& c_scb = scb;
+
+    // empty
+    {
+        auto beg_iter = c_scb.crbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = c_scb.crend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+    // not empty
+    {
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+
+        auto beg_iter = c_scb.crbegin();
+        EXPECT_DEATH({ beg_iter--; }, "");
+
+        auto end_iter = c_scb.crend();
+        EXPECT_DEATH({ end_iter++; }, "");
+    }
+}
+
 TEST_F(ConstCircularBufferTest, forward_iteration)
 {
     simple_circular_buffer<int> scb(3);
@@ -944,25 +1078,39 @@ TEST_F(ConstCircularBufferTest, backward_iteration)
     simple_circular_buffer<int> scb(3);
     const auto& c_scb = scb;
 
-    scb.push_back(0);
-    scb.push_back(1);
-    auto it = c_scb.end();
+    // empty
+    {
+        int counter = 0;
+        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(0, counter);
+    }
+    // not empty
+    {
+        int counter = 0;
+        scb.push_back(0);
+        scb.push_back(1);
+        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(2, counter);
 
-    it--;
-    EXPECT_EQ(1, *it);
-    it--;
-    EXPECT_EQ(0, *it);
+        scb.push_back(2);
+        scb.push_back(3);
+        counter = 0;
+        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+            counter++;
+        EXPECT_EQ(3, counter);
+    }
+    //
+    {
+        auto it = c_scb.rbegin();
 
-    scb.push_back(2);
-    scb.push_back(3);
-    it = c_scb.end();
-
-    it--;
-    EXPECT_EQ(3, *it);
-    it--;
-    EXPECT_EQ(2, *it);
-    it--;
-    EXPECT_EQ(1, *it);
+        EXPECT_EQ(3, *it);
+        it++;
+        EXPECT_EQ(2, *it);
+        it++;
+        EXPECT_EQ(1, *it);
+    }
 }
 
 TEST_F(ConstCircularBufferTest, backward_iteration_const)
@@ -970,25 +1118,39 @@ TEST_F(ConstCircularBufferTest, backward_iteration_const)
     simple_circular_buffer<int> scb(3);
     const auto& c_scb = scb;
 
-    scb.push_back(0);
-    scb.push_back(1);
-    auto it = c_scb.cend();
+    // empty
+    {
+        int counter = 0;
+        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(0, counter);
+    }
+    // not empty
+    {
+        int counter = 0;
+        scb.push_back(0);
+        scb.push_back(1);
+        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(2, counter);
 
-    it--;
-    EXPECT_EQ(1, *it);
-    it--;
-    EXPECT_EQ(0, *it);
+        scb.push_back(2);
+        scb.push_back(3);
+        counter = 0;
+        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+            counter++;
+        EXPECT_EQ(3, counter);
+    }
+    //
+    {
+        auto it = c_scb.crbegin();
 
-    scb.push_back(2);
-    scb.push_back(3);
-    it = c_scb.cend();
-
-    it--;
-    EXPECT_EQ(3, *it);
-    it--;
-    EXPECT_EQ(2, *it);
-    it--;
-    EXPECT_EQ(1, *it);
+        EXPECT_EQ(3, *it);
+        it++;
+        EXPECT_EQ(2, *it);
+        it++;
+        EXPECT_EQ(1, *it);
+    }
 }
 
 }

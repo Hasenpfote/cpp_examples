@@ -190,6 +190,9 @@ public:
     using iterator = _scb_iterator<self_type, std::iterator_traits<pointer>>;
     using const_iterator = _scb_const_iterator<self_type, std::iterator_traits<const_pointer>>;
 
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
     using array_range_t = std::pair<pointer, size_type>;
     using const_array_range_t = std::pair<const_pointer, size_type>;
 
@@ -274,6 +277,15 @@ public:
 
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
+
+    reverse_iterator rbegin(){ return reverse_iterator(end()); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+
+    reverse_iterator rend(){ return reverse_iterator(begin()); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+
+    const_reverse_iterator crbegin() const { return rbegin(); }
+    const_reverse_iterator crend() const { return rend(); }
 
 private:
     template<typename U>
