@@ -615,9 +615,9 @@ simple_circular_buffer<T, Allocator>::increment(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto& temp = *this;
-    return const_cast<pointer>(temp.increment());
+    return const_cast<pointer>(temp.increment(ptr));
 #else
-    return const_cast<pointer>(std::as_const(*this).increment());
+    return const_cast<pointer>(std::as_const(*this).increment(ptr));
 #endif
 }
 
@@ -636,9 +636,9 @@ simple_circular_buffer<T, Allocator>::decrement(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
-    return const_cast<pointer>(temp.decrement());
+    return const_cast<pointer>(temp.decrement(ptr));
 #else
-    return const_cast<pointer>(std::as_const(*this).decrement());
+    return const_cast<pointer>(std::as_const(*this).decrement(ptr));
 #endif
 }
 
