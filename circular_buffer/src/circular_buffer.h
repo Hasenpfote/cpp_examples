@@ -17,27 +17,34 @@ public:
     using difference_type   = typename Traits::difference_type;
     using _Tptr             = typename Traits::value_type*;
 
-    _scb_const_iterator() = delete;
+    _scb_const_iterator()
+        : cb_(nullptr), ptr_(nullptr)
+    {}
+
     _scb_const_iterator(const _scb_const_iterator&) = default;
+    _scb_const_iterator& operator = (const _scb_const_iterator&) = default;
+
     _scb_const_iterator(_scb_const_iterator&&) = default;
-    _scb_const_iterator& operator=(const _scb_const_iterator&) = default;
-    _scb_const_iterator& operator=(_scb_const_iterator&&) = default;
+    _scb_const_iterator& operator = (_scb_const_iterator&&) = default;
 
     _scb_const_iterator(const SCB* cb, _Tptr ptr)
         : cb_(cb), ptr_(ptr)
     {}
 
-    reference operator*()
+    // Indirection operator.
+    reference operator * ()
     {
         return *ptr_;
     }
 
-    pointer operator->()
+    // Structure dereference operator.
+    pointer operator -> ()
     {
         return ptr_;
     }
 
-    _scb_const_iterator& operator++()
+    // Increment operator (prefix).
+    _scb_const_iterator& operator ++ ()
     {
         assert(ptr_ != cb_->buffer_end());
 
@@ -49,14 +56,16 @@ public:
         return *this;
     }
 
-    _scb_const_iterator operator++(int)
+    // Increment operator (postfix).
+    _scb_const_iterator operator ++ (int)
     {
         _scb_const_iterator temp = *this;
         ++(*this);
         return temp;
     }
 
-    _scb_const_iterator& operator--()
+    // Decrement operator (prefix).
+    _scb_const_iterator& operator -- ()
     {
         assert(ptr_ != cb_->buffer_begin());
 
@@ -68,19 +77,22 @@ public:
         return *this;
     }
 
-    _scb_const_iterator operator--(int)
+    // Decrement operator (postfix).
+    _scb_const_iterator operator -- (int)
     {
         _scb_const_iterator temp = *this;
         --(*this);
         return temp;
     }
 
-    bool operator==(const _scb_const_iterator& rhs)
+    // Equal to operator.
+    bool operator == (const _scb_const_iterator& rhs)
     {
         return ptr_ == rhs.ptr_;
     }
 
-    bool operator!=(const _scb_const_iterator& rhs)
+    // Not equal to operator.
+    bool operator != (const _scb_const_iterator& rhs)
     {
         return ptr_ != rhs.ptr_;
     }
@@ -100,27 +112,34 @@ public:
     using reference         = typename Traits::reference;
     using difference_type   = typename Traits::difference_type;
 
-    _scb_iterator() = delete;
+    _scb_iterator()
+        : cb_(nullptr), ptr_(nullptr)
+    {}
+
     _scb_iterator(const _scb_iterator&) = default;
-    _scb_iterator(_scb_iterator&&) = default;
     _scb_iterator& operator=(const _scb_iterator&) = default;
+
+    _scb_iterator(_scb_iterator&&) = default;
     _scb_iterator& operator=(_scb_iterator&&) = default;
 
     _scb_iterator(const SCB* cb, pointer ptr)
         : cb_(cb), ptr_(ptr)
     {}
 
-    reference operator*()
+    // Indirection operator.
+    reference operator * ()
     {
         return *ptr_;
     }
 
-    pointer operator->()
+    // Structure dereference operator.
+    pointer operator -> ()
     {
         return ptr_;
     }
 
-    _scb_iterator& operator++()
+    // Increment operator (prefix).
+    _scb_iterator& operator ++ ()
     {
         assert(ptr_ != cb_->buffer_end());
 
@@ -132,14 +151,16 @@ public:
         return *this;
     }
 
-    _scb_iterator operator++(int)
+    // Increment operator (postfix).
+    _scb_iterator operator ++ (int)
     {
         _scb_iterator temp = *this;
         ++(*this);
         return temp;
     }
 
-    _scb_iterator& operator--()
+    // Decrement operator (prefix).
+    _scb_iterator& operator -- ()
     {
         assert(ptr_ != cb_->buffer_begin());
 
@@ -151,19 +172,22 @@ public:
         return *this;
     }
 
-    _scb_iterator operator--(int)
+    // Decrement operator (postfix).
+    _scb_iterator operator -- (int)
     {
         _scb_iterator temp = *this;
         --(*this);
         return temp;
     }
 
-    bool operator==(const _scb_iterator& rhs)
+    // Equal to operator.
+    bool operator == (const _scb_iterator& rhs)
     {
         return ptr_ == rhs.ptr_;
     }
 
-    bool operator!=(const _scb_iterator& rhs)
+    // Not equal to operator.
+    bool operator != (const _scb_iterator& rhs)
     {
         return ptr_ != rhs.ptr_;
     }
