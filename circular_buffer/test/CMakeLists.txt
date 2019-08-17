@@ -15,7 +15,9 @@ include_directories(${TARGET_SRC_DIR})
 
 #
 set(ALL_FILES
-    test_circular_buffer.cpp
+    test_cb.cpp
+    test_cb_iterator.cpp
+    test_cb_const_iterator.cpp
     # Add a new file here.
     )
 
