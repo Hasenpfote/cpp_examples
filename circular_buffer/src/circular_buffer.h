@@ -265,7 +265,7 @@ public:
     reference back();
     const_reference back() const;
 
-    void clear() noexcept;
+    void clear();
 
     template<typename U = T>
     std::enable_if_t<std::is_copy_constructible<U>::value, void>
@@ -434,8 +434,15 @@ simple_circular_buffer<T, Allocator>::back() const
 }
 
 template<typename T, typename Allocator>
-void simple_circular_buffer<T, Allocator>::clear() noexcept
+void simple_circular_buffer<T, Allocator>::clear()
 {
+    const auto old_capacity = array_.size();
+    if(old_capacity > 0)
+    {
+        array_.clear();
+        // In practice, no memory reallocation occurs.
+        array_.resize(old_capacity);
+    }
     head_ = 0;
     tail_ = 0;
     contents_size_ = 0;

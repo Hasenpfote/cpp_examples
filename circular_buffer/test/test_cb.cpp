@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gtest/gtest-spi.h>
 #include <circular_buffer.h>
 
 namespace
@@ -200,6 +201,9 @@ TEST_F(CBTest, clear)
     EXPECT_EQ(1, scb.size());
     EXPECT_EQ(1, c_scb.size());
 
+    EXPECT_EQ(3, scb.capacity());
+    EXPECT_EQ(3, c_scb.capacity());
+
     scb.clear();
     EXPECT_EQ(0, scb.head());
     EXPECT_EQ(0, c_scb.head());
@@ -210,7 +214,18 @@ TEST_F(CBTest, clear)
     EXPECT_EQ(0, scb.size());
     EXPECT_EQ(0, c_scb.size());
 
-    scb.push_back(1);
+    EXPECT_EQ(3, scb.capacity());
+    EXPECT_EQ(3, c_scb.capacity());
+
+    EXPECT_NONFATAL_FAILURE(
+        EXPECT_DEATH(
+            {
+                simple_circular_buffer<int> scb(3);
+                scb.clear();
+                scb.push_back(1);
+            },
+            ""),
+        "");
 }
 
 TEST_F(CBTest, head)
