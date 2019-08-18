@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <memory>
 #include <iterator>
+#include <utility>
 
 template<typename SCB, typename Traits>
 class _scb_iterator
@@ -223,16 +224,36 @@ public:
     ~simple_circular_buffer() = default;
 
     simple_circular_buffer(const simple_circular_buffer&) = default;
-    simple_circular_buffer& operator=(const simple_circular_buffer&) = default;
+    simple_circular_buffer& operator = (const simple_circular_buffer&) = default;
 
-    simple_circular_buffer(simple_circular_buffer&&) = default;
-    simple_circular_buffer& operator=(simple_circular_buffer&&) = default;
+    simple_circular_buffer(simple_circular_buffer&& other) noexcept
+        : array_(std::move(other.array_))
+        , head_(other.head_)
+        , tail_(other.tail_)
+        , contents_size_(other.contents_size_)
+    {
+        other.clear();
+    }
+
+    simple_circular_buffer& operator = (simple_circular_buffer&& other) noexcept
+    {
+        if(this != &other)
+        {
+            array_ = std::move(other.array_);
+            head_ = other.head_;
+            tail_ = other.tail_;
+            contents_size_ = other.contents_size_;
+
+            other.clear();
+        }
+        return *this;
+    }
 
     explicit simple_circular_buffer(size_type capacity = 100)
-        : array_(capacity)
     {
         assert(capacity > 0);
         clear();
+        array_.resize(capacity);
     }
 
     reference operator[](size_type index);
@@ -415,6 +436,7 @@ simple_circular_buffer<T, Allocator>::back() const
 template<typename T, typename Allocator>
 void simple_circular_buffer<T, Allocator>::clear() noexcept
 {
+    array_.clear();
     head_ = 0;
     tail_ = 0;
     contents_size_ = 0;

@@ -6,6 +6,59 @@ namespace
 
 class CBTest : public ::testing::Test {};
 
+TEST_F(CBTest, move_construction)
+{
+    simple_circular_buffer<int> scb(3);
+
+    scb.push_back(1);
+    scb.push_back(2);
+    scb.push_back(3);
+
+    auto capacity = scb.capacity();
+    auto head = scb.head();
+    auto tail = scb.tail();
+    auto size = scb.size();
+
+    simple_circular_buffer<int> scb2(std::move(scb));
+
+    EXPECT_EQ(0, scb.capacity());
+    EXPECT_EQ(0, scb.head());
+    EXPECT_EQ(0, scb.tail());
+    EXPECT_EQ(0, scb.size());
+
+    EXPECT_EQ(capacity, scb2.capacity());
+    EXPECT_EQ(head, scb2.head());
+    EXPECT_EQ(tail, scb2.tail());
+    EXPECT_EQ(size, scb2.size());
+}
+
+TEST_F(CBTest, move_assignment)
+{
+    simple_circular_buffer<int> scb(3);
+
+    scb.push_back(1);
+    scb.push_back(2);
+    scb.push_back(3);
+
+    auto capacity = scb.capacity();
+    auto head = scb.head();
+    auto tail = scb.tail();
+    auto size = scb.size();
+
+    simple_circular_buffer<int> scb2(1);
+    scb2 = std::move(scb);
+
+    EXPECT_EQ(0, scb.capacity());
+    EXPECT_EQ(0, scb.head());
+    EXPECT_EQ(0, scb.tail());
+    EXPECT_EQ(0, scb.size());
+
+    EXPECT_EQ(capacity, scb2.capacity());
+    EXPECT_EQ(head, scb2.head());
+    EXPECT_EQ(tail, scb2.tail());
+    EXPECT_EQ(size, scb2.size());
+}
+
 TEST_F(CBTest, subscript_operator)
 {
     {
