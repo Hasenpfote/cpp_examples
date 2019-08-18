@@ -436,7 +436,6 @@ simple_circular_buffer<T, Allocator>::back() const
 template<typename T, typename Allocator>
 void simple_circular_buffer<T, Allocator>::clear() noexcept
 {
-    array_.clear();
     head_ = 0;
     tail_ = 0;
     contents_size_ = 0;

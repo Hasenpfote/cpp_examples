@@ -209,6 +209,8 @@ TEST_F(CBTest, clear)
 
     EXPECT_EQ(0, scb.size());
     EXPECT_EQ(0, c_scb.size());
+
+    scb.push_back(1);
 }
 
 TEST_F(CBTest, head)
