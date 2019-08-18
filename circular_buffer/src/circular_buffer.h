@@ -6,6 +6,7 @@
 #include <memory>
 #include <iterator>
 #include <utility>
+#include <stdexcept>
 
 template<typename SCB, typename Traits>
 class _scb_iterator
@@ -258,6 +259,9 @@ public:
     reference operator[](size_type index);
     const_reference operator[](size_type index) const;
 
+    reference at(size_type index);
+    const_reference at(size_type index) const;
+
     reference front();
     const_reference front() const;
 
@@ -387,6 +391,28 @@ simple_circular_buffer<T, Allocator>::operator[](size_type index) const
     const auto mid = capacity() - head_;
     const auto actual_index = (index < mid)? index + head_ : index - mid;
     return array_[actual_index];
+}
+
+template<typename T, typename Allocator>
+typename simple_circular_buffer<T, Allocator>::reference
+simple_circular_buffer<T, Allocator>::at(size_type index)
+{
+#if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
+    const auto & temp = *this;
+    return const_cast<reference>(temp.at(index));
+#else
+    return const_cast<reference>(std::as_const(*this).at(index));
+#endif
+}
+
+template<typename T, typename Allocator>
+typename simple_circular_buffer<T, Allocator>::const_reference
+simple_circular_buffer<T, Allocator>::at(size_type index) const
+{
+    assert(!is_empty());
+    if(index >= size())
+        throw std::out_of_range("Index out of bounds.");
+    return (*this)[index];
 }
 
 template<typename T, typename Allocator>

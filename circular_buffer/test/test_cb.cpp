@@ -128,6 +128,43 @@ TEST_F(CBTest, subscript_operator)
     }
 }
 
+TEST_F(CBTest, at)
+{
+#if !defined(NDEBUG)
+    {
+        simple_circular_buffer<int> scb(3);
+        const auto& c_scb = scb;
+
+        EXPECT_DEATH({ scb.at(0); }, "");
+        EXPECT_DEATH({ scb.at(2); }, "");
+        EXPECT_DEATH({ scb.at(3); }, "");
+
+        EXPECT_DEATH({ c_scb.at(0); }, "");
+        EXPECT_DEATH({ c_scb.at(2); }, "");
+        EXPECT_DEATH({ c_scb.at(3); }, "");
+    }
+#endif
+    {
+        simple_circular_buffer<int> scb(3);
+        const auto& c_scb = scb;
+
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+        scb.push_back(3);
+        scb.pop_front();
+
+        EXPECT_EQ(2, scb.at(0));
+        EXPECT_EQ(3, scb.at(1));
+
+        EXPECT_EQ(2, c_scb.at(0));
+        EXPECT_EQ(3, c_scb.at(1));
+
+        EXPECT_THROW({ scb.at(2); }, std::out_of_range);
+        EXPECT_THROW({ c_scb.at(2); }, std::out_of_range);
+    }
+}
+
 TEST_F(CBTest, front)
 {
     {
