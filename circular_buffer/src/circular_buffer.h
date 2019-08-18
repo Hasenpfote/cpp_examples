@@ -2,7 +2,6 @@
 #include <cassert>
 #include <vector>
 #include <utility>
-#include <limits>
 #include <algorithm>
 #include <memory>
 #include <iterator>
@@ -384,11 +383,9 @@ typename simple_circular_buffer<T, Allocator>::const_reference
 simple_circular_buffer<T, Allocator>::operator[](size_type index) const
 {
     assert(!is_empty());
-    assert(index < capacity());
-    constexpr auto max_limit = std::numeric_limits<std::size_t>::max();
-    auto diff = max_limit - capacity();
-    auto padding = (index > diff)? diff : static_cast<decltype(diff)>(0);
-    auto actual_index = (head_ + index + padding) % capacity();
+    assert(index < size());
+    const auto mid = capacity() - head_;
+    const auto actual_index = (index < mid)? index + head_ : index - mid;
     return array_[actual_index];
 }
 

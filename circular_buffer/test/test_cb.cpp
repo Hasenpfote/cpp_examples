@@ -62,6 +62,36 @@ TEST_F(CBTest, move_assignment)
 
 TEST_F(CBTest, subscript_operator)
 {
+#if !defined(NDEBUG)
+    {
+        simple_circular_buffer<int> scb(3);
+        const auto& c_scb = scb;
+
+        EXPECT_DEATH({ scb[0]; }, "");
+        EXPECT_DEATH({ scb[2]; }, "");
+        EXPECT_DEATH({ scb[3]; }, "");
+
+        EXPECT_DEATH({ c_scb[0]; }, "");
+        EXPECT_DEATH({ c_scb[2]; }, "");
+        EXPECT_DEATH({ c_scb[3]; }, "");
+
+        scb.push_back(0);
+        scb.push_back(1);
+        scb.push_back(2);
+        scb.push_back(3);
+        scb.pop_front();
+
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ scb[0]; }, ""), "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ scb[1]; }, ""), "");
+        EXPECT_DEATH({ scb[2]; }, "");
+        EXPECT_DEATH({ scb[3]; }, "");
+
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_scb[0]; }, ""), "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_scb[1]; }, ""), "");
+        EXPECT_DEATH({ c_scb[2]; }, "");
+        EXPECT_DEATH({ c_scb[3]; }, "");
+    }
+#endif
     {
         simple_circular_buffer<int> scb(3);
         const auto& c_scb = scb;
