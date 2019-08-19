@@ -406,7 +406,7 @@ typename circular_buffer<T, Allocator>::reference
 circular_buffer<T, Allocator>::at(size_type index)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<reference>(temp.at(index));
 #else
     return const_cast<reference>(std::as_const(*this).at(index));
@@ -624,7 +624,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::array_begin()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.array_begin());
 #else
     return const_cast<pointer>(std::as_const(*this).array_begin());
@@ -643,7 +643,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::array_end()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.array_end());
 #else
     return const_cast<pointer>(std::as_const(*this).array_end());
@@ -662,7 +662,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::buffer_begin()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.buffer_begin());
 #else
     return const_cast<pointer>(std::as_const(*this).buffer_begin());
@@ -681,7 +681,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::buffer_end()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.buffer_end());
 #else
     return const_cast<pointer>(std::as_const(*this).buffer_end());
@@ -721,7 +721,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::decrement(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.decrement(ptr));
 #else
     return const_cast<pointer>(std::as_const(*this).decrement(ptr));
@@ -743,7 +743,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.linearize_pointer(ptr));
 #else
     return const_cast<pointer>(std::as_const(*this).linearize_pointer(ptr));
@@ -766,7 +766,7 @@ typename circular_buffer<T, Allocator>::pointer
 circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
-    const auto & temp = *this;
+    const auto& temp = *this;
     return const_cast<pointer>(temp.unlinearize_pointer(ptr));
 #else
     return const_cast<pointer>(std::as_const(*this).unlinearize_pointer(ptr));
@@ -781,7 +781,7 @@ circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) const
         return ptr;
 
     const auto mid = array_end() - buffer_begin();
-    const auto offset = (ptr < array_begin() + mid) ? (buffer_begin() - array_begin()) : -mid;
+    const auto offset = (ptr < array_begin() + mid)? (buffer_begin() - array_begin()) : -mid;
     return ptr + offset;
 }
 
