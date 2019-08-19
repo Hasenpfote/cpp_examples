@@ -19,11 +19,13 @@ struct Foo
     int value_;
 };
 
+using namespace container;
+
 TEST_F(CBConstIteratorTest, is_input_iterator)
 {
     // Is copy-constructible, copy-assignable and destructible
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb::const_iterator a;
         auto b(a);
@@ -33,7 +35,7 @@ TEST_F(CBConstIteratorTest, is_input_iterator)
     // Can be compared for equivalence using the equality/inequality operators
     // (meaningful if both iterators are be in domain).
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         {
@@ -52,7 +54,7 @@ TEST_F(CBConstIteratorTest, is_input_iterator)
 
     // Can be dereferenced as an rvalue(if in a dereferenceable state).
     {
-        using my_cb = simple_circular_buffer<Foo>;
+        using my_cb = circular_buffer<Foo>;
 
         my_cb cb(3);
         cb.push_back(Foo(1));
@@ -72,7 +74,7 @@ TEST_F(CBConstIteratorTest, is_input_iterator)
     // The result is either also dereferenceable or a past - the - end iterator.
     // The previous iterator value is not required to be dereferenceable after the increase
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(4);
         cb.push_back(1);
@@ -95,7 +97,7 @@ TEST_F(CBConstIteratorTest, is_input_iterator)
     // Lvalues are swappable.
 #if 0
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -119,7 +121,7 @@ TEST_F(CBConstIteratorTest, is_output_iterator)
 {
     // Is copy - constructible, copy - assignable and destructible
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb::const_iterator a;
         auto b(a);
@@ -131,7 +133,7 @@ TEST_F(CBConstIteratorTest, is_output_iterator)
     // Once dereferenced, its iterator value may no longer be dereferenceable.
 #if 0
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(1);
         cb.push_back(1);
@@ -151,7 +153,7 @@ TEST_F(CBConstIteratorTest, is_output_iterator)
 #endif
     // Can be incremented.
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(4);
         cb.push_back(1);
@@ -179,7 +181,7 @@ TEST_F(CBConstIteratorTest, is_output_iterator)
     // Lvalues are swappable.
 #if 0
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -205,7 +207,7 @@ TEST_F(CBConstIteratorTest, is_forward_iterator)
     // Can be dereferenced as an lvalue(if in a dereferenceable state)
 #if 0
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(1);
         cb.push_back(1);
@@ -230,7 +232,7 @@ TEST_F(CBConstIteratorTest, is_bidirectional_iterator)
 {
     // Can be decremented (if a dereferenceable iterator value precedes it).
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -260,7 +262,7 @@ TEST_F(CBConstIteratorTest, is_random_access_iterator)
     // Supports the arithmetic operators + and - between an iterator and an integer value,
     // or subtracting an iterator from another.
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -299,7 +301,7 @@ TEST_F(CBConstIteratorTest, is_random_access_iterator)
 
     // Can be compared with inequality relational operators (<, >, <= and >=).
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -328,7 +330,7 @@ TEST_F(CBConstIteratorTest, is_random_access_iterator)
 
     // Supports compound assignment operations += and -=
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);
@@ -353,7 +355,7 @@ TEST_F(CBConstIteratorTest, is_random_access_iterator)
 
     // Supports the offset dereference operator ([])
     {
-        using my_cb = simple_circular_buffer<int>;
+        using my_cb = circular_buffer<int>;
 
         my_cb cb(3);
         cb.push_back(1);

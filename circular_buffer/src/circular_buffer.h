@@ -8,8 +8,14 @@
 #include <utility>
 #include <stdexcept>
 
-template<typename SCB, typename Traits>
-class _scb_iterator
+namespace container
+{
+
+namespace detail
+{
+
+template<typename CB, typename Traits>
+class circular_buffer_iterator
 {
 public:
     using iterator_category = std::random_access_iterator_tag;
@@ -18,17 +24,17 @@ public:
     using reference         = typename Traits::reference;
     using difference_type   = typename Traits::difference_type;
 
-    _scb_iterator()
+    circular_buffer_iterator()
         : cb_(nullptr), ptr_(nullptr)
     {}
 
-    _scb_iterator(const _scb_iterator&) = default;
-    _scb_iterator& operator = (const _scb_iterator&) = default;
+    circular_buffer_iterator(const circular_buffer_iterator&) = default;
+    circular_buffer_iterator& operator = (const circular_buffer_iterator&) = default;
 
-    _scb_iterator(_scb_iterator&&) = default;
-    _scb_iterator& operator = (_scb_iterator&&) = default;
+    circular_buffer_iterator(circular_buffer_iterator&&) = default;
+    circular_buffer_iterator& operator = (circular_buffer_iterator&&) = default;
 
-    _scb_iterator(const SCB* cb, const pointer ptr)
+    circular_buffer_iterator(const CB* cb, const pointer ptr)
         : cb_(cb), ptr_(ptr)
     {}
 
@@ -45,7 +51,7 @@ public:
     }
 
     // Increment operator (prefix).
-    _scb_iterator& operator ++ ()
+    circular_buffer_iterator& operator ++ ()
     {
         assert(ptr_ != cb_->buffer_end());
 
@@ -58,15 +64,15 @@ public:
     }
 
     // Increment operator (postfix).
-    _scb_iterator operator ++ (int)
+    circular_buffer_iterator operator ++ (int)
     {
-        _scb_iterator temp = *this;
+        circular_buffer_iterator temp = *this;
         ++(*this);
         return temp;
     }
 
     // Decrement operator (prefix).
-    _scb_iterator& operator -- ()
+    circular_buffer_iterator& operator -- ()
     {
         assert(ptr_ != cb_->buffer_begin());
 
@@ -79,15 +85,15 @@ public:
     }
 
     // Decrement operator (postfix).
-    _scb_iterator operator -- (int)
+    circular_buffer_iterator operator -- (int)
     {
-        _scb_iterator temp = *this;
+        circular_buffer_iterator temp = *this;
         --(*this);
         return temp;
     }
 
     // Subtraction operator.
-    difference_type operator - (const _scb_iterator& rhs) const
+    difference_type operator - (const circular_buffer_iterator& rhs) const
     {
         return cb_->linearize_pointer(ptr_) - cb_->linearize_pointer(rhs.ptr_);
     }
@@ -99,7 +105,7 @@ public:
     }
 
     // Addition assignment operator.
-    _scb_iterator& operator += (difference_type n)
+    circular_buffer_iterator& operator += (difference_type n)
     {
         if(n > 0)
         {
@@ -115,13 +121,13 @@ public:
     }
 
     // Addition operator.
-    _scb_iterator operator + (difference_type n) const
+    circular_buffer_iterator operator + (difference_type n) const
     {
-        return _scb_iterator(*this) += n;
+        return circular_buffer_iterator(*this) += n;
     }
 
     // Subtraction assignment operator.
-    _scb_iterator& operator -= (difference_type n)
+    circular_buffer_iterator& operator -= (difference_type n)
     {
         if(n > 0)
         {
@@ -137,67 +143,69 @@ public:
     }
 
     // Subtraction operator.
-    _scb_iterator operator - (difference_type n) const
+    circular_buffer_iterator operator - (difference_type n) const
     {
-        return _scb_iterator(*this) -= n;
+        return circular_buffer_iterator(*this) -= n;
     }
 
 // Comparison operators.
 
     // Equal to operator.
-    bool operator == (const _scb_iterator& rhs) const
+    bool operator == (const circular_buffer_iterator& rhs) const
     {
         return ptr_ == rhs.ptr_;
     }
 
     // Not equal to operator.
-    bool operator != (const _scb_iterator& rhs) const
+    bool operator != (const circular_buffer_iterator& rhs) const
     {
         return ptr_ != rhs.ptr_;
     }
 
     // Less than operator.
-    bool operator < (const _scb_iterator& rhs) const
+    bool operator < (const circular_buffer_iterator& rhs) const
     {
         return cb_->linearize_pointer(ptr_) < cb_->linearize_pointer(rhs.ptr_);
     }
 
     // Greater than operator.
-    bool operator > (const _scb_iterator& rhs) const
+    bool operator > (const circular_buffer_iterator& rhs) const
     {
         return rhs < *this;
     }
 
     // Less than or equal to operator.
-    bool operator <= (const _scb_iterator& rhs) const
+    bool operator <= (const circular_buffer_iterator& rhs) const
     {
         return !(rhs < *this);
     }
 
     // Greater than or equal to operator.
-    bool operator >= (const _scb_iterator& rhs) const
+    bool operator >= (const circular_buffer_iterator& rhs) const
     {
         return !(*this < rhs);
     }
 
 private:
-    const SCB* cb_;
+    const CB* cb_;
     pointer ptr_;
 };
 
 // Addition operator.
-template<typename SCB, typename Traits>
-inline _scb_iterator<SCB, Traits>
-operator + (typename Traits::difference_type n, const _scb_iterator<SCB, Traits>& rhs)
+template<typename CB, typename Traits>
+inline circular_buffer_iterator<CB, Traits>
+operator + (typename Traits::difference_type n, const circular_buffer_iterator<CB, Traits>& rhs)
 {
     return rhs + n;
 }
 
+}   // namespace detail
+
 template<typename T, typename Allocator = std::allocator<T>>
-class simple_circular_buffer final
+class circular_buffer final
 {
 public:
-    using self_type         = simple_circular_buffer<T, Allocator>;
+    using self_type         = circular_buffer<T, Allocator>;
     using value_type        = typename std::allocator_traits<Allocator>::value_type;
     using pointer           = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer     = typename std::allocator_traits<Allocator>::const_pointer;
@@ -207,8 +215,8 @@ public:
     using size_type         = typename std::allocator_traits<Allocator>::size_type;
     using allocator_type    = Allocator;
 
-    using iterator = _scb_iterator<self_type, std::iterator_traits<pointer>>;
-    using const_iterator = _scb_iterator<self_type, std::iterator_traits<const_pointer>>;
+    using iterator = detail::circular_buffer_iterator<self_type, std::iterator_traits<pointer>>;
+    using const_iterator = detail::circular_buffer_iterator<self_type, std::iterator_traits<const_pointer>>;
 
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -220,13 +228,13 @@ public:
     friend const_iterator;
 
 public:
-    simple_circular_buffer() = delete;
-    ~simple_circular_buffer() = default;
+    circular_buffer() = delete;
+    ~circular_buffer() = default;
 
-    simple_circular_buffer(const simple_circular_buffer&) = default;
-    simple_circular_buffer& operator = (const simple_circular_buffer&) = default;
+    circular_buffer(const circular_buffer&) = default;
+    circular_buffer& operator = (const circular_buffer&) = default;
 
-    simple_circular_buffer(simple_circular_buffer&& other) noexcept
+    circular_buffer(circular_buffer&& other) noexcept
         : array_(std::move(other.array_))
         , head_(other.head_)
         , tail_(other.tail_)
@@ -235,7 +243,7 @@ public:
         other.clear();
     }
 
-    simple_circular_buffer& operator = (simple_circular_buffer&& other) noexcept
+    circular_buffer& operator = (circular_buffer&& other) noexcept
     {
         if(this != &other)
         {
@@ -249,7 +257,7 @@ public:
         return *this;
     }
 
-    explicit simple_circular_buffer(size_type capacity = 100)
+    explicit circular_buffer(size_type capacity = 100)
     {
         assert(capacity > 0);
         clear();
@@ -371,8 +379,8 @@ private:
 };
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::reference
-simple_circular_buffer<T, Allocator>::operator[](size_type index)
+typename circular_buffer<T, Allocator>::reference
+circular_buffer<T, Allocator>::operator[](size_type index)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto& temp = *this;
@@ -383,8 +391,8 @@ simple_circular_buffer<T, Allocator>::operator[](size_type index)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_reference
-simple_circular_buffer<T, Allocator>::operator[](size_type index) const
+typename circular_buffer<T, Allocator>::const_reference
+circular_buffer<T, Allocator>::operator[](size_type index) const
 {
     assert(!is_empty());
     assert(index < size());
@@ -394,8 +402,8 @@ simple_circular_buffer<T, Allocator>::operator[](size_type index) const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::reference
-simple_circular_buffer<T, Allocator>::at(size_type index)
+typename circular_buffer<T, Allocator>::reference
+circular_buffer<T, Allocator>::at(size_type index)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -406,8 +414,8 @@ simple_circular_buffer<T, Allocator>::at(size_type index)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_reference
-simple_circular_buffer<T, Allocator>::at(size_type index) const
+typename circular_buffer<T, Allocator>::const_reference
+circular_buffer<T, Allocator>::at(size_type index) const
 {
     assert(!is_empty());
     if(index >= size())
@@ -416,8 +424,8 @@ simple_circular_buffer<T, Allocator>::at(size_type index) const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::reference
-simple_circular_buffer<T, Allocator>::front()
+typename circular_buffer<T, Allocator>::reference
+circular_buffer<T, Allocator>::front()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto& temp = *this;
@@ -428,16 +436,16 @@ simple_circular_buffer<T, Allocator>::front()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_reference
-simple_circular_buffer<T, Allocator>::front() const
+typename circular_buffer<T, Allocator>::const_reference
+circular_buffer<T, Allocator>::front() const
 {
     assert(!is_empty());
     return array_[head_];
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::reference
-simple_circular_buffer<T, Allocator>::back()
+typename circular_buffer<T, Allocator>::reference
+circular_buffer<T, Allocator>::back()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto& temp = *this;
@@ -448,8 +456,8 @@ simple_circular_buffer<T, Allocator>::back()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_reference
-simple_circular_buffer<T, Allocator>::back() const
+typename circular_buffer<T, Allocator>::const_reference
+circular_buffer<T, Allocator>::back() const
 {
     assert(!is_empty());
     auto index = (tail_ > 0)? tail_ - 1 : capacity() - 1;
@@ -457,7 +465,7 @@ simple_circular_buffer<T, Allocator>::back() const
 }
 
 template<typename T, typename Allocator>
-void simple_circular_buffer<T, Allocator>::clear()
+void circular_buffer<T, Allocator>::clear()
 {
     const auto old_capacity = array_.size();
     if(old_capacity > 0)
@@ -474,7 +482,7 @@ void simple_circular_buffer<T, Allocator>::clear()
 template<typename T, typename Allocator>
 template<typename U>
 std::enable_if_t<std::is_copy_constructible<U>::value, void>
-simple_circular_buffer<T, Allocator>::push_front(const_reference item)
+circular_buffer<T, Allocator>::push_front(const_reference item)
 {
     push_front_fwd(item);
 }
@@ -482,14 +490,14 @@ simple_circular_buffer<T, Allocator>::push_front(const_reference item)
 template<typename T, typename Allocator>
 template<typename U>
 std::enable_if_t<std::is_move_constructible<U>::value, void>
-simple_circular_buffer<T, Allocator>::push_front(value_type&& item)
+circular_buffer<T, Allocator>::push_front(value_type&& item)
 {
     push_front_fwd(std::move(item));
 }
 
 template<typename T, typename Allocator>
 template<typename U>
-void simple_circular_buffer<T, Allocator>::push_front_fwd(U&& item)
+void circular_buffer<T, Allocator>::push_front_fwd(U&& item)
 {
     const auto cap = capacity();
 
@@ -509,7 +517,7 @@ void simple_circular_buffer<T, Allocator>::push_front_fwd(U&& item)
 template<typename T, typename Allocator>
 template<typename U>
 std::enable_if_t<std::is_copy_constructible<U>::value, void>
-simple_circular_buffer<T, Allocator>::push_back(const_reference item)
+circular_buffer<T, Allocator>::push_back(const_reference item)
 {
     push_back_fwd(item);
 }
@@ -517,14 +525,14 @@ simple_circular_buffer<T, Allocator>::push_back(const_reference item)
 template<typename T, typename Allocator>
 template<typename U>
 std::enable_if_t<std::is_move_constructible<U>::value, void>
-simple_circular_buffer<T, Allocator>::push_back(value_type&& item)
+circular_buffer<T, Allocator>::push_back(value_type&& item)
 {
     push_back_fwd(std::move(item));
 }
 
 template<typename T, typename Allocator>
 template<typename U>
-void simple_circular_buffer<T, Allocator>::push_back_fwd(U&& item)
+void circular_buffer<T, Allocator>::push_back_fwd(U&& item)
 {
     const auto cap = capacity();
 
@@ -542,7 +550,7 @@ void simple_circular_buffer<T, Allocator>::push_back_fwd(U&& item)
 }
 
 template<typename T, typename Allocator>
-void simple_circular_buffer<T, Allocator>::pop_front()
+void circular_buffer<T, Allocator>::pop_front()
 {
     assert(!is_empty());
     head_ = (head_ < (capacity() - 1))? head_ + 1 : 0;
@@ -550,7 +558,7 @@ void simple_circular_buffer<T, Allocator>::pop_front()
 }
 
 template<typename T, typename Allocator>
-void simple_circular_buffer<T, Allocator>::pop_back()
+void circular_buffer<T, Allocator>::pop_back()
 {
     assert(!is_empty());
     tail_ = (tail_ > 0)? tail_ - 1 : capacity() - 1;
@@ -558,8 +566,8 @@ void simple_circular_buffer<T, Allocator>::pop_back()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::array_range_t
-simple_circular_buffer<T, Allocator>::array_one()
+typename circular_buffer<T, Allocator>::array_range_t
+circular_buffer<T, Allocator>::array_one()
 {
     assert(!is_empty());
     auto size = (head_ < tail_)? tail_ - head_ : capacity() - head_;
@@ -567,8 +575,8 @@ simple_circular_buffer<T, Allocator>::array_one()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_array_range_t
-simple_circular_buffer<T, Allocator>::array_one() const
+typename circular_buffer<T, Allocator>::const_array_range_t
+circular_buffer<T, Allocator>::array_one() const
 {
     assert(!is_empty());
     auto size = (head_ < tail_)? tail_ - head_ : capacity() - head_;
@@ -576,8 +584,8 @@ simple_circular_buffer<T, Allocator>::array_one() const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::array_range_t
-simple_circular_buffer<T, Allocator>::array_two()
+typename circular_buffer<T, Allocator>::array_range_t
+circular_buffer<T, Allocator>::array_two()
 {
     assert(!is_empty());
     auto size = (tail_ > head_)? 0 : tail_;
@@ -585,8 +593,8 @@ simple_circular_buffer<T, Allocator>::array_two()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_array_range_t
-simple_circular_buffer<T, Allocator>::array_two() const
+typename circular_buffer<T, Allocator>::const_array_range_t
+circular_buffer<T, Allocator>::array_two() const
 {
     assert(!is_empty());
     auto size = (tail_ > head_)? 0 : tail_;
@@ -594,13 +602,13 @@ simple_circular_buffer<T, Allocator>::array_two() const
 }
 
 template<typename T, typename Allocator>
-bool simple_circular_buffer<T, Allocator>::is_linearized() const
+bool circular_buffer<T, Allocator>::is_linearized() const
 {
     return head_ == 0;
 }
 
 template<typename T, typename Allocator>
-void simple_circular_buffer<T, Allocator>::linearize()
+void circular_buffer<T, Allocator>::linearize()
 {
     if(is_linearized())
         return;
@@ -612,8 +620,8 @@ void simple_circular_buffer<T, Allocator>::linearize()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::array_begin()
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::array_begin()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -624,15 +632,15 @@ simple_circular_buffer<T, Allocator>::array_begin()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::array_begin() const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::array_begin() const
 {
     return array_.data();
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::array_end()
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::array_end()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -643,15 +651,15 @@ simple_circular_buffer<T, Allocator>::array_end()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::array_end() const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::array_end() const
 {
     return array_.data() + array_.size();
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::buffer_begin()
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::buffer_begin()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -662,15 +670,15 @@ simple_circular_buffer<T, Allocator>::buffer_begin()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::buffer_begin() const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::buffer_begin() const
 {
     return &array_[head_];
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::buffer_end()
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::buffer_end()
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -681,15 +689,15 @@ simple_circular_buffer<T, Allocator>::buffer_end()
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::buffer_end() const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::buffer_end() const
 {
     return (is_full())? array_end() : &array_[tail_];
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::increment(const_pointer ptr)
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::increment(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto& temp = *this;
@@ -700,8 +708,8 @@ simple_circular_buffer<T, Allocator>::increment(const_pointer ptr)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::increment(const_pointer ptr) const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::increment(const_pointer ptr) const
 {
     if(++ptr == array_end())
         ptr = array_begin();
@@ -709,8 +717,8 @@ simple_circular_buffer<T, Allocator>::increment(const_pointer ptr) const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::decrement(const_pointer ptr)
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::decrement(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -721,8 +729,8 @@ simple_circular_buffer<T, Allocator>::decrement(const_pointer ptr)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::decrement(const_pointer ptr) const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::decrement(const_pointer ptr) const
 {
     if(ptr == array_begin())
         ptr = array_end();
@@ -731,8 +739,8 @@ simple_circular_buffer<T, Allocator>::decrement(const_pointer ptr) const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr)
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -743,8 +751,8 @@ simple_circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr) const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr) const
 {
     if(ptr == array_end())
         return ptr;
@@ -754,8 +762,8 @@ simple_circular_buffer<T, Allocator>::linearize_pointer(const_pointer ptr) const
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::pointer
-simple_circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr)
+typename circular_buffer<T, Allocator>::pointer
+circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr)
 {
 #if (defined(_MSC_VER) && (_MSVC_LANG < 201703L)) || (__cplusplus < 201703L)
     const auto & temp = *this;
@@ -766,8 +774,8 @@ simple_circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr)
 }
 
 template<typename T, typename Allocator>
-typename simple_circular_buffer<T, Allocator>::const_pointer
-simple_circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) const
+typename circular_buffer<T, Allocator>::const_pointer
+circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) const
 {
     if(ptr == array_end())
         return ptr;
@@ -776,3 +784,5 @@ simple_circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) con
     const auto offset = (ptr < array_begin() + mid) ? (buffer_begin() - array_begin()) : -mid;
     return ptr + offset;
 }
+
+}   // namespace container

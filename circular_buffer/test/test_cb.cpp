@@ -7,124 +7,126 @@ namespace
 
 class CBTest : public ::testing::Test {};
 
+using namespace container;
+
 TEST_F(CBTest, move_construction)
 {
-    simple_circular_buffer<int> scb(3);
+    circular_buffer<int> cb(3);
 
-    scb.push_back(1);
-    scb.push_back(2);
-    scb.push_back(3);
+    cb.push_back(1);
+    cb.push_back(2);
+    cb.push_back(3);
 
-    auto capacity = scb.capacity();
-    auto head = scb.head();
-    auto tail = scb.tail();
-    auto size = scb.size();
+    auto capacity = cb.capacity();
+    auto head = cb.head();
+    auto tail = cb.tail();
+    auto size = cb.size();
 
-    simple_circular_buffer<int> scb2(std::move(scb));
+    circular_buffer<int> cb2(std::move(cb));
 
-    EXPECT_EQ(0, scb.capacity());
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, scb.tail());
-    EXPECT_EQ(0, scb.size());
+    EXPECT_EQ(0, cb.capacity());
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, cb.tail());
+    EXPECT_EQ(0, cb.size());
 
-    EXPECT_EQ(capacity, scb2.capacity());
-    EXPECT_EQ(head, scb2.head());
-    EXPECT_EQ(tail, scb2.tail());
-    EXPECT_EQ(size, scb2.size());
+    EXPECT_EQ(capacity, cb2.capacity());
+    EXPECT_EQ(head, cb2.head());
+    EXPECT_EQ(tail, cb2.tail());
+    EXPECT_EQ(size, cb2.size());
 }
 
 TEST_F(CBTest, move_assignment)
 {
-    simple_circular_buffer<int> scb(3);
+    circular_buffer<int> cb(3);
 
-    scb.push_back(1);
-    scb.push_back(2);
-    scb.push_back(3);
+    cb.push_back(1);
+    cb.push_back(2);
+    cb.push_back(3);
 
-    auto capacity = scb.capacity();
-    auto head = scb.head();
-    auto tail = scb.tail();
-    auto size = scb.size();
+    auto capacity = cb.capacity();
+    auto head = cb.head();
+    auto tail = cb.tail();
+    auto size = cb.size();
 
-    simple_circular_buffer<int> scb2(1);
-    scb2 = std::move(scb);
+    circular_buffer<int> cb2(1);
+    cb2 = std::move(cb);
 
-    EXPECT_EQ(0, scb.capacity());
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, scb.tail());
-    EXPECT_EQ(0, scb.size());
+    EXPECT_EQ(0, cb.capacity());
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, cb.tail());
+    EXPECT_EQ(0, cb.size());
 
-    EXPECT_EQ(capacity, scb2.capacity());
-    EXPECT_EQ(head, scb2.head());
-    EXPECT_EQ(tail, scb2.tail());
-    EXPECT_EQ(size, scb2.size());
+    EXPECT_EQ(capacity, cb2.capacity());
+    EXPECT_EQ(head, cb2.head());
+    EXPECT_EQ(tail, cb2.tail());
+    EXPECT_EQ(size, cb2.size());
 }
 
 TEST_F(CBTest, subscript_operator)
 {
 #if !defined(NDEBUG)
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        EXPECT_DEATH({ scb[0]; }, "");
-        EXPECT_DEATH({ scb[2]; }, "");
-        EXPECT_DEATH({ scb[3]; }, "");
+        EXPECT_DEATH({ cb[0]; }, "");
+        EXPECT_DEATH({ cb[2]; }, "");
+        EXPECT_DEATH({ cb[3]; }, "");
 
-        EXPECT_DEATH({ c_scb[0]; }, "");
-        EXPECT_DEATH({ c_scb[2]; }, "");
-        EXPECT_DEATH({ c_scb[3]; }, "");
+        EXPECT_DEATH({ c_cb[0]; }, "");
+        EXPECT_DEATH({ c_cb[2]; }, "");
+        EXPECT_DEATH({ c_cb[3]; }, "");
 
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.push_back(3);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.push_back(3);
+        cb.pop_front();
 
-        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ scb[0]; }, ""), "");
-        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ scb[1]; }, ""), "");
-        EXPECT_DEATH({ scb[2]; }, "");
-        EXPECT_DEATH({ scb[3]; }, "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ cb[0]; }, ""), "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ cb[1]; }, ""), "");
+        EXPECT_DEATH({ cb[2]; }, "");
+        EXPECT_DEATH({ cb[3]; }, "");
 
-        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_scb[0]; }, ""), "");
-        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_scb[1]; }, ""), "");
-        EXPECT_DEATH({ c_scb[2]; }, "");
-        EXPECT_DEATH({ c_scb[3]; }, "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_cb[0]; }, ""), "");
+        EXPECT_NONFATAL_FAILURE(EXPECT_DEATH({ c_cb[1]; }, ""), "");
+        EXPECT_DEATH({ c_cb[2]; }, "");
+        EXPECT_DEATH({ c_cb[3]; }, "");
     }
 #endif
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.push_back(3);
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.push_back(3);
 
-        EXPECT_EQ(1, scb[0]);
-        EXPECT_EQ(2, scb[1]);
-        EXPECT_EQ(3, scb[2]);
+        EXPECT_EQ(1, cb[0]);
+        EXPECT_EQ(2, cb[1]);
+        EXPECT_EQ(3, cb[2]);
 
-        EXPECT_EQ(1, c_scb[0]);
-        EXPECT_EQ(2, c_scb[1]);
-        EXPECT_EQ(3, c_scb[2]);
+        EXPECT_EQ(1, c_cb[0]);
+        EXPECT_EQ(2, c_cb[1]);
+        EXPECT_EQ(3, c_cb[2]);
     }
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_front(0);
-        scb.push_front(1);
-        scb.push_front(2);
-        scb.push_front(3);
+        cb.push_front(0);
+        cb.push_front(1);
+        cb.push_front(2);
+        cb.push_front(3);
 
-        EXPECT_EQ(3, scb[0]);
-        EXPECT_EQ(2, scb[1]);
-        EXPECT_EQ(1, scb[2]);
+        EXPECT_EQ(3, cb[0]);
+        EXPECT_EQ(2, cb[1]);
+        EXPECT_EQ(1, cb[2]);
 
-        EXPECT_EQ(3, c_scb[0]);
-        EXPECT_EQ(2, c_scb[1]);
-        EXPECT_EQ(1, c_scb[2]);
+        EXPECT_EQ(3, c_cb[0]);
+        EXPECT_EQ(2, c_cb[1]);
+        EXPECT_EQ(1, c_cb[2]);
     }
 }
 
@@ -132,164 +134,164 @@ TEST_F(CBTest, at)
 {
 #if !defined(NDEBUG)
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        EXPECT_DEATH({ scb.at(0); }, "");
-        EXPECT_DEATH({ scb.at(2); }, "");
-        EXPECT_DEATH({ scb.at(3); }, "");
+        EXPECT_DEATH({ cb.at(0); }, "");
+        EXPECT_DEATH({ cb.at(2); }, "");
+        EXPECT_DEATH({ cb.at(3); }, "");
 
-        EXPECT_DEATH({ c_scb.at(0); }, "");
-        EXPECT_DEATH({ c_scb.at(2); }, "");
-        EXPECT_DEATH({ c_scb.at(3); }, "");
+        EXPECT_DEATH({ c_cb.at(0); }, "");
+        EXPECT_DEATH({ c_cb.at(2); }, "");
+        EXPECT_DEATH({ c_cb.at(3); }, "");
     }
 #endif
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.push_back(3);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.push_back(3);
+        cb.pop_front();
 
-        EXPECT_EQ(2, scb.at(0));
-        EXPECT_EQ(3, scb.at(1));
+        EXPECT_EQ(2, cb.at(0));
+        EXPECT_EQ(3, cb.at(1));
 
-        EXPECT_EQ(2, c_scb.at(0));
-        EXPECT_EQ(3, c_scb.at(1));
+        EXPECT_EQ(2, c_cb.at(0));
+        EXPECT_EQ(3, c_cb.at(1));
 
-        EXPECT_THROW({ scb.at(2); }, std::out_of_range);
-        EXPECT_THROW({ c_scb.at(2); }, std::out_of_range);
+        EXPECT_THROW({ cb.at(2); }, std::out_of_range);
+        EXPECT_THROW({ c_cb.at(2); }, std::out_of_range);
     }
 }
 
 TEST_F(CBTest, front)
 {
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_front(0);
-        EXPECT_EQ(0, scb.front());
-        EXPECT_EQ(0, c_scb.front());
+        cb.push_front(0);
+        EXPECT_EQ(0, cb.front());
+        EXPECT_EQ(0, c_cb.front());
 
-        scb.push_front(1);
-        EXPECT_EQ(1, scb.front());
-        EXPECT_EQ(1, c_scb.front());
+        cb.push_front(1);
+        EXPECT_EQ(1, cb.front());
+        EXPECT_EQ(1, c_cb.front());
 
-        scb.push_front(2);
-        EXPECT_EQ(2, scb.front());
-        EXPECT_EQ(2, c_scb.front());
+        cb.push_front(2);
+        EXPECT_EQ(2, cb.front());
+        EXPECT_EQ(2, c_cb.front());
 
-        scb.push_front(3);
-        EXPECT_EQ(3, scb.front());
-        EXPECT_EQ(3, c_scb.front());
+        cb.push_front(3);
+        EXPECT_EQ(3, cb.front());
+        EXPECT_EQ(3, c_cb.front());
     }
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_back(0);
-        EXPECT_EQ(0, scb.front());
-        EXPECT_EQ(0, c_scb.front());
+        cb.push_back(0);
+        EXPECT_EQ(0, cb.front());
+        EXPECT_EQ(0, c_cb.front());
 
-        scb.push_back(1);
-        EXPECT_EQ(0, scb.front());
-        EXPECT_EQ(0, c_scb.front());
+        cb.push_back(1);
+        EXPECT_EQ(0, cb.front());
+        EXPECT_EQ(0, c_cb.front());
 
-        scb.push_back(2);
-        EXPECT_EQ(0, scb.front());
-        EXPECT_EQ(0, c_scb.front());
+        cb.push_back(2);
+        EXPECT_EQ(0, cb.front());
+        EXPECT_EQ(0, c_cb.front());
 
-        scb.push_back(3);
-        EXPECT_EQ(1, scb.front());
-        EXPECT_EQ(1, c_scb.front());
+        cb.push_back(3);
+        EXPECT_EQ(1, cb.front());
+        EXPECT_EQ(1, c_cb.front());
     }
 }
 
 TEST_F(CBTest, back)
 {
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_front(0);
-        EXPECT_EQ(0, scb.back());
-        EXPECT_EQ(0, c_scb.back());
+        cb.push_front(0);
+        EXPECT_EQ(0, cb.back());
+        EXPECT_EQ(0, c_cb.back());
 
-        scb.push_front(1);
-        EXPECT_EQ(0, scb.back());
-        EXPECT_EQ(0, c_scb.back());
+        cb.push_front(1);
+        EXPECT_EQ(0, cb.back());
+        EXPECT_EQ(0, c_cb.back());
 
-        scb.push_front(2);
-        EXPECT_EQ(0, scb.back());
-        EXPECT_EQ(0, c_scb.back());
+        cb.push_front(2);
+        EXPECT_EQ(0, cb.back());
+        EXPECT_EQ(0, c_cb.back());
 
-        scb.push_front(3);
-        EXPECT_EQ(1, scb.back());
-        EXPECT_EQ(1, c_scb.back());
+        cb.push_front(3);
+        EXPECT_EQ(1, cb.back());
+        EXPECT_EQ(1, c_cb.back());
     }
     {
-        simple_circular_buffer<int> scb(3);
-        const auto& c_scb = scb;
+        circular_buffer<int> cb(3);
+        const auto& c_cb = cb;
 
-        scb.push_back(0);
-        EXPECT_EQ(0, scb.back());
-        EXPECT_EQ(0, c_scb.back());
+        cb.push_back(0);
+        EXPECT_EQ(0, cb.back());
+        EXPECT_EQ(0, c_cb.back());
 
-        scb.push_back(1);
-        EXPECT_EQ(1, scb.back());
-        EXPECT_EQ(1, c_scb.back());
+        cb.push_back(1);
+        EXPECT_EQ(1, cb.back());
+        EXPECT_EQ(1, c_cb.back());
 
-        scb.push_back(2);
-        EXPECT_EQ(2, scb.back());
-        EXPECT_EQ(2, c_scb.back());
+        cb.push_back(2);
+        EXPECT_EQ(2, cb.back());
+        EXPECT_EQ(2, c_cb.back());
 
-        scb.push_back(3);
-        EXPECT_EQ(3, scb.back());
-        EXPECT_EQ(3, c_scb.back());
+        cb.push_back(3);
+        EXPECT_EQ(3, cb.back());
+        EXPECT_EQ(3, c_cb.back());
     }
 }
 
 TEST_F(CBTest, clear)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    scb.push_back(0);
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    cb.push_back(0);
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    EXPECT_EQ(1, scb.tail());
-    EXPECT_EQ(1, c_scb.tail());
+    EXPECT_EQ(1, cb.tail());
+    EXPECT_EQ(1, c_cb.tail());
 
-    EXPECT_EQ(1, scb.size());
-    EXPECT_EQ(1, c_scb.size());
+    EXPECT_EQ(1, cb.size());
+    EXPECT_EQ(1, c_cb.size());
 
-    EXPECT_EQ(3, scb.capacity());
-    EXPECT_EQ(3, c_scb.capacity());
+    EXPECT_EQ(3, cb.capacity());
+    EXPECT_EQ(3, c_cb.capacity());
 
-    scb.clear();
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    cb.clear();
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    EXPECT_EQ(0, scb.tail());
-    EXPECT_EQ(0, c_scb.tail());
+    EXPECT_EQ(0, cb.tail());
+    EXPECT_EQ(0, c_cb.tail());
 
-    EXPECT_EQ(0, scb.size());
-    EXPECT_EQ(0, c_scb.size());
+    EXPECT_EQ(0, cb.size());
+    EXPECT_EQ(0, c_cb.size());
 
-    EXPECT_EQ(3, scb.capacity());
-    EXPECT_EQ(3, c_scb.capacity());
+    EXPECT_EQ(3, cb.capacity());
+    EXPECT_EQ(3, c_cb.capacity());
 
     EXPECT_NONFATAL_FAILURE(
         EXPECT_DEATH(
             {
-                simple_circular_buffer<int> scb(3);
-                scb.clear();
-                scb.push_back(1);
+                circular_buffer<int> cb(3);
+                cb.clear();
+                cb.push_back(1);
             },
             ""),
         "");
@@ -297,176 +299,176 @@ TEST_F(CBTest, clear)
 
 TEST_F(CBTest, head)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    scb.push_back(0);
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    cb.push_back(0);
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    scb.push_back(1);
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    cb.push_back(1);
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    scb.push_back(2);
-    EXPECT_EQ(0, scb.head());
-    EXPECT_EQ(0, c_scb.head());
+    cb.push_back(2);
+    EXPECT_EQ(0, cb.head());
+    EXPECT_EQ(0, c_cb.head());
 
-    scb.push_back(3);
-    EXPECT_EQ(1, scb.head());
-    EXPECT_EQ(1, c_scb.head());
+    cb.push_back(3);
+    EXPECT_EQ(1, cb.head());
+    EXPECT_EQ(1, c_cb.head());
 }
 
 TEST_F(CBTest, tail)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(0, scb.tail());
-    EXPECT_EQ(0, c_scb.tail());
+    EXPECT_EQ(0, cb.tail());
+    EXPECT_EQ(0, c_cb.tail());
 
-    scb.push_back(0);
-    EXPECT_EQ(1, scb.tail());
-    EXPECT_EQ(1, c_scb.tail());
+    cb.push_back(0);
+    EXPECT_EQ(1, cb.tail());
+    EXPECT_EQ(1, c_cb.tail());
 
-    scb.push_back(1);
-    EXPECT_EQ(2, scb.tail());
-    EXPECT_EQ(2, c_scb.tail());
+    cb.push_back(1);
+    EXPECT_EQ(2, cb.tail());
+    EXPECT_EQ(2, c_cb.tail());
 
-    scb.push_back(2);
-    EXPECT_EQ(0, scb.tail());
-    EXPECT_EQ(0, c_scb.tail());
+    cb.push_back(2);
+    EXPECT_EQ(0, cb.tail());
+    EXPECT_EQ(0, c_cb.tail());
 }
 
 TEST_F(CBTest, size)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    scb.push_back(0);
-    EXPECT_EQ(1, scb.size());
-    EXPECT_EQ(1, c_scb.size());
+    cb.push_back(0);
+    EXPECT_EQ(1, cb.size());
+    EXPECT_EQ(1, c_cb.size());
 
-    scb.push_back(1);
-    EXPECT_EQ(2, scb.size());
-    EXPECT_EQ(2, c_scb.size());
+    cb.push_back(1);
+    EXPECT_EQ(2, cb.size());
+    EXPECT_EQ(2, c_cb.size());
 
-    scb.push_back(2);
-    EXPECT_EQ(3, scb.size());
-    EXPECT_EQ(3, c_scb.size());
+    cb.push_back(2);
+    EXPECT_EQ(3, cb.size());
+    EXPECT_EQ(3, c_cb.size());
 
-    scb.push_back(3);
-    EXPECT_EQ(3, scb.size());
-    EXPECT_EQ(3, c_scb.size());
+    cb.push_back(3);
+    EXPECT_EQ(3, cb.size());
+    EXPECT_EQ(3, c_cb.size());
 
-    scb.pop_front();
-    EXPECT_EQ(2, scb.size());
-    EXPECT_EQ(2, c_scb.size());
+    cb.pop_front();
+    EXPECT_EQ(2, cb.size());
+    EXPECT_EQ(2, c_cb.size());
 }
 
 TEST_F(CBTest, is_empty)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(true, scb.is_empty());
-    EXPECT_EQ(true, c_scb.is_empty());
+    EXPECT_EQ(true, cb.is_empty());
+    EXPECT_EQ(true, c_cb.is_empty());
 
-    scb.push_back(0);
-    EXPECT_EQ(false, scb.is_empty());
-    EXPECT_EQ(false, c_scb.is_empty());
+    cb.push_back(0);
+    EXPECT_EQ(false, cb.is_empty());
+    EXPECT_EQ(false, c_cb.is_empty());
 
-    scb.pop_front();
-    EXPECT_EQ(true, scb.is_empty());
-    EXPECT_EQ(true, c_scb.is_empty());
+    cb.pop_front();
+    EXPECT_EQ(true, cb.is_empty());
+    EXPECT_EQ(true, c_cb.is_empty());
 }
 
 TEST_F(CBTest, is_full)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(false, scb.is_full());
-    EXPECT_EQ(false, c_scb.is_full());
+    EXPECT_EQ(false, cb.is_full());
+    EXPECT_EQ(false, c_cb.is_full());
 
-    scb.push_back(0);
-    EXPECT_EQ(false, scb.is_full());
-    EXPECT_EQ(false, c_scb.is_full());
+    cb.push_back(0);
+    EXPECT_EQ(false, cb.is_full());
+    EXPECT_EQ(false, c_cb.is_full());
 
-    scb.push_back(1);
-    EXPECT_EQ(false, scb.is_full());
-    EXPECT_EQ(false, c_scb.is_full());
+    cb.push_back(1);
+    EXPECT_EQ(false, cb.is_full());
+    EXPECT_EQ(false, c_cb.is_full());
 
-    scb.push_back(2);
-    EXPECT_EQ(true, scb.is_full());
-    EXPECT_EQ(true, c_scb.is_full());
+    cb.push_back(2);
+    EXPECT_EQ(true, cb.is_full());
+    EXPECT_EQ(true, c_cb.is_full());
 
-    scb.push_back(3);
-    EXPECT_EQ(true, scb.is_full());
-    EXPECT_EQ(true, c_scb.is_full());
+    cb.push_back(3);
+    EXPECT_EQ(true, cb.is_full());
+    EXPECT_EQ(true, c_cb.is_full());
 
-    scb.pop_front();
-    EXPECT_EQ(false, scb.is_full());
-    EXPECT_EQ(false, c_scb.is_full());
+    cb.pop_front();
+    EXPECT_EQ(false, cb.is_full());
+    EXPECT_EQ(false, c_cb.is_full());
 }
 
 TEST_F(CBTest, capacity)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(3, scb.capacity());
-    EXPECT_EQ(3, c_scb.capacity());
+    EXPECT_EQ(3, cb.capacity());
+    EXPECT_EQ(3, c_cb.capacity());
 }
 
 TEST_F(CBTest, array_one)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    auto p = scb.data();
-    auto cp = c_scb.data();
+    auto p = cb.data();
+    auto cp = c_cb.data();
 
-    scb.push_back(0);
+    cb.push_back(0);
     {
-        auto a = scb.array_one();
+        auto a = cb.array_one();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(1, a.second);
 
-        auto ca = c_scb.array_one();
+        auto ca = c_cb.array_one();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(1, ca.second);
     }
-    scb.push_back(1);
+    cb.push_back(1);
     {
-        auto a = scb.array_one();
+        auto a = cb.array_one();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(2, a.second);
 
-        auto ca = c_scb.array_one();
+        auto ca = c_cb.array_one();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(2, ca.second);
     }
-    scb.push_back(2);
+    cb.push_back(2);
     {
-        auto a = scb.array_one();
+        auto a = cb.array_one();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(3, a.second);
 
-        auto ca = c_scb.array_one();
+        auto ca = c_cb.array_one();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(3, ca.second);
     }
-    scb.push_back(3);
+    cb.push_back(3);
     {
-        auto a = scb.array_one();
+        auto a = cb.array_one();
         EXPECT_EQ(p + 1, a.first);
         EXPECT_EQ(2, a.second);
 
-        auto ca = c_scb.array_one();
+        auto ca = c_cb.array_one();
         EXPECT_EQ(cp + 1, ca.first);
         EXPECT_EQ(2, ca.second);
     }
@@ -474,49 +476,49 @@ TEST_F(CBTest, array_one)
 
 TEST_F(CBTest, array_two)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    auto p = scb.data();
-    auto cp = c_scb.data();
+    auto p = cb.data();
+    auto cp = c_cb.data();
 
-    scb.push_back(0);
+    cb.push_back(0);
     {
-        auto a = scb.array_two();
+        auto a = cb.array_two();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(0, a.second);
 
-        auto ca = c_scb.array_two();
+        auto ca = c_cb.array_two();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(0, ca.second);
     }
-    scb.push_back(1);
+    cb.push_back(1);
     {
-        auto a = scb.array_two();
+        auto a = cb.array_two();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(0, a.second);
 
-        auto ca = c_scb.array_two();
+        auto ca = c_cb.array_two();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(0, ca.second);
     }
-    scb.push_back(2);
+    cb.push_back(2);
     {
-        auto a = scb.array_two();
+        auto a = cb.array_two();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(0, a.second);
 
-        auto ca = c_scb.array_two();
+        auto ca = c_cb.array_two();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(0, ca.second);
     }
-    scb.push_back(3);
+    cb.push_back(3);
     {
-        auto a = scb.array_two();
+        auto a = cb.array_two();
         EXPECT_EQ(p, a.first);
         EXPECT_EQ(1, a.second);
 
-        auto ca = c_scb.array_two();
+        auto ca = c_cb.array_two();
         EXPECT_EQ(cp, ca.first);
         EXPECT_EQ(1, ca.second);
     }
@@ -524,61 +526,61 @@ TEST_F(CBTest, array_two)
 
 TEST_F(CBTest, is_linearized)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    EXPECT_EQ(true, scb.is_linearized());
-    EXPECT_EQ(true, c_scb.is_linearized());
+    EXPECT_EQ(true, cb.is_linearized());
+    EXPECT_EQ(true, c_cb.is_linearized());
 
-    scb.push_back(0);
-    EXPECT_EQ(true, scb.is_linearized());
-    EXPECT_EQ(true, c_scb.is_linearized());
+    cb.push_back(0);
+    EXPECT_EQ(true, cb.is_linearized());
+    EXPECT_EQ(true, c_cb.is_linearized());
 
-    scb.push_back(1);
-    EXPECT_EQ(true, scb.is_linearized());
-    EXPECT_EQ(true, c_scb.is_linearized());
+    cb.push_back(1);
+    EXPECT_EQ(true, cb.is_linearized());
+    EXPECT_EQ(true, c_cb.is_linearized());
 
-    scb.push_back(2);
-    EXPECT_EQ(true, scb.is_linearized());
-    EXPECT_EQ(true, c_scb.is_linearized());
+    cb.push_back(2);
+    EXPECT_EQ(true, cb.is_linearized());
+    EXPECT_EQ(true, c_cb.is_linearized());
 
-    scb.push_back(3);
-    EXPECT_EQ(false, scb.is_linearized());
-    EXPECT_EQ(false, c_scb.is_linearized());
+    cb.push_back(3);
+    EXPECT_EQ(false, cb.is_linearized());
+    EXPECT_EQ(false, c_cb.is_linearized());
 
-    scb.push_front(4);
-    EXPECT_EQ(true, scb.is_linearized());
-    EXPECT_EQ(true, c_scb.is_linearized());
+    cb.push_front(4);
+    EXPECT_EQ(true, cb.is_linearized());
+    EXPECT_EQ(true, c_cb.is_linearized());
 }
 
 TEST_F(CBTest, linearize)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
-    scb.push_back(0);
-    scb.push_back(1);
-    scb.push_back(2);
-    scb.push_back(3);
+    cb.push_back(0);
+    cb.push_back(1);
+    cb.push_back(2);
+    cb.push_back(3);
 
-    auto p = scb.data();
+    auto p = cb.data();
     EXPECT_EQ(3, *(p + 0));
     EXPECT_EQ(1, *(p + 1));
     EXPECT_EQ(2, *(p + 2));
 
-    auto cp = c_scb.data();
+    auto cp = c_cb.data();
     EXPECT_EQ(3, *(cp + 0));
     EXPECT_EQ(1, *(cp + 1));
     EXPECT_EQ(2, *(cp + 2));
 
-    scb.linearize();
+    cb.linearize();
 
-    p = scb.data();
+    p = cb.data();
     EXPECT_EQ(1, *(p + 0));
     EXPECT_EQ(2, *(p + 1));
     EXPECT_EQ(3, *(p + 2));
 
-    cp = c_scb.data();
+    cp = c_cb.data();
     EXPECT_EQ(1, *(cp + 0));
     EXPECT_EQ(2, *(cp + 1));
     EXPECT_EQ(3, *(cp + 2));
@@ -589,46 +591,46 @@ TEST_F(CBTest, iterator_bounds)
 #if defined(NDEBUG)
     GTEST_SKIP();
 #else
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         {
-            auto beg_iter = scb.begin();
+            auto beg_iter = cb.begin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.end();
+            auto end_iter = cb.end();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.begin();
+            auto beg_iter = c_cb.begin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.end();
+            auto end_iter = c_cb.end();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
 
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.pop_front();
 
         {
-            auto beg_iter = scb.begin();
+            auto beg_iter = cb.begin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.end();
+            auto end_iter = cb.end();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.begin();
+            auto beg_iter = c_cb.begin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.end();
+            auto end_iter = c_cb.end();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
@@ -640,45 +642,45 @@ TEST_F(CBTest, const_iterator_bounds)
 #if defined(NDEBUG)
     GTEST_SKIP();
 #else
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         {
-            auto beg_iter = scb.cbegin();
+            auto beg_iter = cb.cbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.cend();
+            auto end_iter = cb.cend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.cbegin();
+            auto beg_iter = c_cb.cbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.cend();
+            auto end_iter = c_cb.cend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.pop_front();
 
         {
-            auto beg_iter = scb.cbegin();
+            auto beg_iter = cb.cbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.cend();
+            auto end_iter = cb.cend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.cbegin();
+            auto beg_iter = c_cb.cbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.cend();
+            auto end_iter = c_cb.cend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
@@ -690,45 +692,45 @@ TEST_F(CBTest, reverse_iterator_bounds)
 #if defined(NDEBUG)
     GTEST_SKIP();
 #else
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         {
-            auto beg_iter = scb.rbegin();
+            auto beg_iter = cb.rbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.rend();
+            auto end_iter = cb.rend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.rbegin();
+            auto beg_iter = c_cb.rbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.rend();
+            auto end_iter = c_cb.rend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.pop_front();
 
         {
-            auto beg_iter = scb.rbegin();
+            auto beg_iter = cb.rbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.rend();
+            auto end_iter = cb.rend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.rbegin();
+            auto beg_iter = c_cb.rbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.rend();
+            auto end_iter = c_cb.rend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
@@ -740,45 +742,45 @@ TEST_F(CBTest, const_reverse_iterator_bounds)
 #if defined(NDEBUG)
     GTEST_SKIP();
 #else
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         {
-            auto beg_iter = scb.crbegin();
+            auto beg_iter = cb.crbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.crend();
+            auto end_iter = cb.crend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.crbegin();
+            auto beg_iter = c_cb.crbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.crend();
+            auto end_iter = c_cb.crend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
-        scb.push_back(2);
-        scb.pop_front();
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        cb.pop_front();
 
         {
-            auto beg_iter = scb.crbegin();
+            auto beg_iter = cb.crbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = scb.crend();
+            auto end_iter = cb.crend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
         {
-            auto beg_iter = c_scb.crbegin();
+            auto beg_iter = c_cb.crbegin();
             EXPECT_DEATH({ beg_iter--; }, "");
 
-            auto end_iter = c_scb.crend();
+            auto end_iter = c_cb.crend();
             EXPECT_DEATH({ end_iter++; }, "");
         }
     }
@@ -787,53 +789,53 @@ TEST_F(CBTest, const_reverse_iterator_bounds)
 
 TEST_F(CBTest, forward_iteration)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         int counter = 0;
-        for(auto it = scb.begin(); it != scb.end(); it++)
+        for(auto it = cb.begin(); it != cb.end(); it++)
             counter++;
         EXPECT_EQ(0, counter);
 
         counter = 0;
-        for(auto it = c_scb.begin(); it != c_scb.end(); it++)
+        for(auto it = c_cb.begin(); it != c_cb.end(); it++)
             counter++;
         EXPECT_EQ(0, counter);
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
+        cb.push_back(0);
+        cb.push_back(1);
 
         int counter = 0;
-        for(auto it = scb.begin(); it != scb.end(); it++)
+        for(auto it = cb.begin(); it != cb.end(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
         counter = 0;
-        for(auto it = c_scb.begin(); it != c_scb.end(); it++)
+        for(auto it = c_cb.begin(); it != c_cb.end(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
-        scb.push_back(2);
-        scb.push_back(3);
+        cb.push_back(2);
+        cb.push_back(3);
 
         counter = 0;
-        for(auto it = scb.begin(); it != scb.end(); it++)
+        for(auto it = cb.begin(); it != cb.end(); it++)
             counter++;
         EXPECT_EQ(3, counter);
 
         counter = 0;
-        for(auto it = c_scb.begin(); it != c_scb.end(); it++)
+        for(auto it = c_cb.begin(); it != c_cb.end(); it++)
             counter++;
         EXPECT_EQ(3, counter);
     }
     //
     {
         {
-            auto it = scb.begin();
+            auto it = cb.begin();
 
             EXPECT_EQ(1, *it);
             it++;
@@ -842,7 +844,7 @@ TEST_F(CBTest, forward_iteration)
             EXPECT_EQ(3, *it);
         }
         {
-            auto it = c_scb.begin();
+            auto it = c_cb.begin();
 
             EXPECT_EQ(1, *it);
             it++;
@@ -855,53 +857,53 @@ TEST_F(CBTest, forward_iteration)
 
 TEST_F(CBTest, forward_iteration_const)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         int counter = 0;
-        for(auto it = scb.cbegin(); it != scb.cend(); it++)
+        for(auto it = cb.cbegin(); it != cb.cend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
 
         counter = 0;
-        for(auto it = c_scb.cbegin(); it != c_scb.cend(); it++)
+        for(auto it = c_cb.cbegin(); it != c_cb.cend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
+        cb.push_back(0);
+        cb.push_back(1);
 
         int counter = 0;
-        for(auto it = scb.cbegin(); it != scb.cend(); it++)
+        for(auto it = cb.cbegin(); it != cb.cend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
         counter = 0;
-        for(auto it = c_scb.cbegin(); it != c_scb.cend(); it++)
+        for(auto it = c_cb.cbegin(); it != c_cb.cend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
-        scb.push_back(2);
-        scb.push_back(3);
+        cb.push_back(2);
+        cb.push_back(3);
 
         counter = 0;
-        for(auto it = scb.cbegin(); it != scb.cend(); it++)
+        for(auto it = cb.cbegin(); it != cb.cend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
 
         counter = 0;
-        for(auto it = c_scb.cbegin(); it != c_scb.cend(); it++)
+        for(auto it = c_cb.cbegin(); it != c_cb.cend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
     }
     //
     {
         {
-            auto it = scb.cbegin();
+            auto it = cb.cbegin();
 
             EXPECT_EQ(1, *it);
             it++;
@@ -910,7 +912,7 @@ TEST_F(CBTest, forward_iteration_const)
             EXPECT_EQ(3, *it);
         }
         {
-            auto it = c_scb.cbegin();
+            auto it = c_cb.cbegin();
 
             EXPECT_EQ(1, *it);
             it++;
@@ -923,53 +925,53 @@ TEST_F(CBTest, forward_iteration_const)
 
 TEST_F(CBTest, backward_iteration)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         int counter = 0;
-        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+        for(auto it = cb.rbegin(); it != cb.rend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
 
         counter = 0;
-        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+        for(auto it = c_cb.rbegin(); it != c_cb.rend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
+        cb.push_back(0);
+        cb.push_back(1);
 
         int counter = 0;
-        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+        for(auto it = cb.rbegin(); it != cb.rend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
         counter = 0;
-        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+        for(auto it = c_cb.rbegin(); it != c_cb.rend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
-        scb.push_back(2);
-        scb.push_back(3);
+        cb.push_back(2);
+        cb.push_back(3);
 
         counter = 0;
-        for(auto it = scb.rbegin(); it != scb.rend(); it++)
+        for(auto it = cb.rbegin(); it != cb.rend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
 
         counter = 0;
-        for(auto it = c_scb.rbegin(); it != c_scb.rend(); it++)
+        for(auto it = c_cb.rbegin(); it != c_cb.rend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
     }
     //
     {
         {
-            auto it = scb.rbegin();
+            auto it = cb.rbegin();
 
             EXPECT_EQ(3, *it);
             it++;
@@ -978,7 +980,7 @@ TEST_F(CBTest, backward_iteration)
             EXPECT_EQ(1, *it);
         }
         {
-            auto it = c_scb.rbegin();
+            auto it = c_cb.rbegin();
 
             EXPECT_EQ(3, *it);
             it++;
@@ -991,53 +993,53 @@ TEST_F(CBTest, backward_iteration)
 
 TEST_F(CBTest, backward_iteration_const)
 {
-    simple_circular_buffer<int> scb(3);
-    const auto& c_scb = scb;
+    circular_buffer<int> cb(3);
+    const auto& c_cb = cb;
 
     // empty
     {
         int counter = 0;
-        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+        for(auto it = cb.crbegin(); it != cb.crend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
 
         counter = 0;
-        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+        for(auto it = c_cb.crbegin(); it != c_cb.crend(); it++)
             counter++;
         EXPECT_EQ(0, counter);
     }
     // not empty
     {
-        scb.push_back(0);
-        scb.push_back(1);
+        cb.push_back(0);
+        cb.push_back(1);
 
         int counter = 0;
-        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+        for(auto it = cb.crbegin(); it != cb.crend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
         counter = 0;
-        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+        for(auto it = c_cb.crbegin(); it != c_cb.crend(); it++)
             counter++;
         EXPECT_EQ(2, counter);
 
-        scb.push_back(2);
-        scb.push_back(3);
+        cb.push_back(2);
+        cb.push_back(3);
 
         counter = 0;
-        for(auto it = scb.crbegin(); it != scb.crend(); it++)
+        for(auto it = cb.crbegin(); it != cb.crend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
 
         counter = 0;
-        for(auto it = c_scb.crbegin(); it != c_scb.crend(); it++)
+        for(auto it = c_cb.crbegin(); it != c_cb.crend(); it++)
             counter++;
         EXPECT_EQ(3, counter);
     }
     //
     {
         {
-            auto it = scb.crbegin();
+            auto it = cb.crbegin();
 
             EXPECT_EQ(3, *it);
             it++;
@@ -1046,7 +1048,7 @@ TEST_F(CBTest, backward_iteration_const)
             EXPECT_EQ(1, *it);
         }
         {
-            auto it = c_scb.crbegin();
+            auto it = c_cb.crbegin();
 
             EXPECT_EQ(3, *it);
             it++;
