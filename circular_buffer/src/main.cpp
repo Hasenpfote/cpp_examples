@@ -1,6 +1,7 @@
 #include <iostream>
 #include "circular_buffer.h"
-#include "my_allocator.h"
+#include "custom_allocator.h"
+#include "custom_resource.h"
 
 using namespace container;
 
@@ -64,14 +65,63 @@ void test_cb()
 void test_custom_allocator()
 {
     using value_type = int;
-    using allocator_type = MyAllocator<value_type>;
+    std::cout << "allocator(custom) ---" << std::endl;
+    {
+        using allocator_type = CustomAllocator<value_type>;
 
-    circular_buffer<value_type, allocator_type> cb(5);
-    cb.push_back(0);
-    cb.push_back(1);
-    cb.push_back(2);
-    for(auto x : cb)
-        std::cout << x << std::endl;
+        circular_buffer<value_type, allocator_type> cb(3);
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        for(auto x : cb)
+            std::cout << x << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << "pmr(default) ---" << std::endl;
+    {
+        pmr::circular_buffer<value_type> cb(3);
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        for(auto x : cb)
+            std::cout << x << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << "pmr(custom) ---" << std::endl;
+    {
+        CustomResource test_resource;
+        pmr::circular_buffer<value_type> cb(3, &test_resource);
+        cb.push_back(0);
+        cb.push_back(1);
+        cb.push_back(2);
+        for(auto x : cb)
+            std::cout << x << " ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << "pmr(custom) ---" << std::endl;
+    {
+        CustomResource test_resource;
+        pmr::circular_buffer<value_type> cb1(3);
+        cb1.push_back(0);
+        cb1.push_back(1);
+        cb1.push_back(2);
+
+        pmr::circular_buffer<value_type> cb2(std::move(cb1), &test_resource);
+
+        {
+            bool is_same = typeid(std::pmr::polymorphic_allocator<int>) == typeid(CustomResource);
+            std::cout << "is_same: " << is_same << std::endl;
+        }
+
+        std::cout << "cb1.capacity=" << cb1.capacity() << std::endl;
+
+        for(auto x : cb2)
+            std::cout << x << " ";
+        std::cout << std::endl;
+    }
 }
 
 int main()

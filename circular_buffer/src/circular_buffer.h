@@ -231,17 +231,43 @@ public:
     circular_buffer() = delete;
     ~circular_buffer() = default;
 
-    circular_buffer(const circular_buffer&) = default;
-    circular_buffer& operator = (const circular_buffer&) = default;
+    explicit circular_buffer(size_type capacity, const Allocator& alloc = Allocator())
+        : array_(alloc)
+    {
+        assert(capacity > 0);
+        array_.resize(capacity);
+        set_initial_values();
+    }
+
+    circular_buffer(const circular_buffer& other)
+        : circular_buffer(other, other.get_allocator())
+    {}
+
+    circular_buffer(const circular_buffer& other, const Allocator& alloc)
+        : array_(other.array_, alloc)
+        , head_(other.head_)
+        , tail_(other.tail_)
+        , contents_size_(other.contents_size_)
+    {}
 
     circular_buffer(circular_buffer&& other) noexcept
-        : array_(std::move(other.array_))
+        : circular_buffer(std::move(other), other.get_allocator())
+    {}
+
+    circular_buffer(circular_buffer&& other, const Allocator& alloc)
+        : array_(std::move(other.array_), alloc)
         , head_(other.head_)
         , tail_(other.tail_)
         , contents_size_(other.contents_size_)
     {
-        other.clear();
+        if(other.array_.size() > 0)
+        {   // When both allocator types are different.
+            other.array_.clear();
+        }
+        other.set_initial_values();
     }
+
+    circular_buffer& operator = (const circular_buffer&) = default;
 
     circular_buffer& operator = (circular_buffer&& other) noexcept
     {
@@ -252,16 +278,9 @@ public:
             tail_ = other.tail_;
             contents_size_ = other.contents_size_;
 
-            other.clear();
+            other.set_initial_values();
         }
         return *this;
-    }
-
-    explicit circular_buffer(size_type capacity = 100)
-    {
-        assert(capacity > 0);
-        clear();
-        array_.resize(capacity);
     }
 
     reference operator[](size_type index);
@@ -341,6 +360,8 @@ public:
     const_reverse_iterator crend() const { return rend(); }
 
 private:
+    void set_initial_values() noexcept;
+
     template<typename U>
     void push_front_fwd(U&& item);
 
@@ -377,6 +398,14 @@ private:
     size_type tail_;
     size_type contents_size_;
 };
+
+template<typename T, typename Allocator>
+void circular_buffer<T, Allocator>::set_initial_values() noexcept
+{
+    head_ = 0;
+    tail_ = 0;
+    contents_size_ = 0;
+}
 
 template<typename T, typename Allocator>
 typename circular_buffer<T, Allocator>::reference
@@ -474,9 +503,7 @@ void circular_buffer<T, Allocator>::clear()
         // In practice, no memory reallocation occurs.
         array_.resize(old_capacity);
     }
-    head_ = 0;
-    tail_ = 0;
-    contents_size_ = 0;
+    set_initial_values();
 }
 
 template<typename T, typename Allocator>
@@ -784,5 +811,15 @@ circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) const
     const auto offset = (ptr < array_begin() + mid)? (buffer_begin() - array_begin()) : -mid;
     return ptr + offset;
 }
+
+#if (defined(_MSC_VER) && (_MSVC_LANG >= 201703L)) || (__cplusplus >= 201703L)
+namespace pmr
+{
+
+template<typename T>
+using circular_buffer = container::circular_buffer<T, std::pmr::polymorphic_allocator<T>>;
+
+}   // namespace pmr
+#endif
 
 }   // namespace container

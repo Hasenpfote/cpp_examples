@@ -3,14 +3,20 @@
 #include <iostream>
 
 template <class T>
-struct MyAllocator
+struct CustomAllocator
 {
     using value_type = T;
 
-    MyAllocator(){}
+    CustomAllocator()
+    {
+        std::cout << __func__ << std::endl;
+    }
 
     template <class U>
-    MyAllocator(const MyAllocator<U>&){}
+    CustomAllocator(const CustomAllocator<U>&)
+    {
+        std::cout << __func__ << std::endl;
+    }
 
     T* allocate(std::size_t n)
     {
@@ -27,14 +33,14 @@ struct MyAllocator
 };
 
 template <class T, class U>
-bool operator==(const MyAllocator<T>&, const MyAllocator<U>&)
+bool operator==(const CustomAllocator<T>&, const CustomAllocator<U>&)
 {
     std::cout << __func__ << std::endl;
     return true;
 }
 
 template <class T, class U>
-bool operator!=(const MyAllocator<T>&, const MyAllocator<U>&)
+bool operator!=(const CustomAllocator<T>&, const CustomAllocator<U>&)
 {
     std::cout << __func__ << std::endl;
     return false;
