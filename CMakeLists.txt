@@ -55,6 +55,7 @@ endif()
 set(examples
     "00_example"
     "circular_buffer"
+    "stack_resource"
     # Add a new example here.
 )
 
