@@ -15,7 +15,8 @@ include_directories(${TARGET_SRC_DIR})
 
 #
 set(ALL_FILES
-    test_stack_resource.cpp
+    test_stack_resource_v1.cpp
+    test_stack_resource_v2.cpp
     # Add a new file here.
     )
 
