@@ -151,6 +151,7 @@ namespace v2
 template<std::size_t N, std::size_t Alignment = alignof(std::max_align_t)>
 class arena final
 {
+    static_assert(is_power_of_two(Alignment), "Alignment must be a power of 2.");
 private:
     static constexpr std::size_t align_up(std::size_t x) noexcept
     {
@@ -208,9 +209,10 @@ private:
     std::byte* ptr_ = buffer_;
 };
 
-template<std::size_t N>
+template<std::size_t N, std::size_t Alignment = alignof(std::max_align_t)>
 class stack_resource final : public memory_resource
 {
+    static_assert(is_power_of_two(Alignment), "Alignment must be a power of 2.");
 public:
     static constexpr std::size_t size() noexcept { return N; }
 
@@ -246,7 +248,7 @@ private:
     }
 
 private:
-    arena<N> arena_;
+    arena<N, Alignment> arena_;
 };
 
 }   // v2
