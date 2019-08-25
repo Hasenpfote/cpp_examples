@@ -1,31 +1,27 @@
-stack_resource
+# stack_resource
 
 ---------------------
 
-[stack_alloc](https://howardhinnant.github.io/stack_alloc.html).
-
-[memory_resource](https://cpprefjp.github.io/reference/memory_resource/memory_resource.html).
-
-
+## About
 
 - 標準ライブラリのみを利用
-- スタックを利用するアロケータ
+- スタック領域を利用するアロケータ
 
 
+
+## Compatibility
 
 Supports C++ 17 or higher.
 
-| Compiler | Version                          | Remarks                  |
-| -------- | -------------------------------- | ------------------------ |
-| gcc      | 9.1.0 or higher.                 |                          |
-| clang    | 3.9.1 or higher. ※`experimental` | 9.0.0 でも`experimental` |
-| msvc     |                                  | 16.1.6 で確認            |
-
-※ `experimental`の clang 実装は最適化されていない
+| Compiler | Version                          | Remarks                                                  |
+| -------- | -------------------------------- | -------------------------------------------------------- |
+| gcc      | 9.1.0 or higher.                 |                                                          |
+| clang    | 3.9.1 or higher. ※`experimental` | 9.0.0 でも`experimental`<br />最適化されていない点に注意 |
+| msvc     |                                  | 16.1.6 で確認                                            |
 
 
 
-Files
+## Files
 
 | Name             | Description                      |
 | ---------------- | -------------------------------- |
@@ -34,10 +30,77 @@ Files
 
 
 
-Namespace hierarchy
+## Namespace hierarchy
 
 | 1    | 2         | 3    |
 | ---- | --------- | ---- |
 | root | alignment |      |
 |      | container | pmr  |
 
+
+
+## Note
+
+- v1 
+
+  動的アロケータでよく見られる実装。
+
+  - Pros
+
+    -  -
+
+  - Cons
+
+    - 生アドレスへのオフセット記憶領域が必要
+
+    - 0 <= gap < alignment になるため alignment が大きくなると実効サイズが予想し難い
+
+      ※ 静的に確保するため問題が顕著に表れる
+
+      ```
+      addr:    raw                   [aligned]           next
+      size: ---@---------|------------@---------~--------@---
+               |<- gap ->|<- offset ->|<- request size ->|
+      
+      offset == pointer size
+      actual size = gap + offset + request size
+      ```
+
+    
+
+- v2
+
+  参考文献1 の Howard Hinnant の手法。
+
+  - Pros
+
+    - コンテナ専用アロケータとなるので v1 に見られるオフセット記憶領域は不要
+
+  - Cons
+
+    - arena-alignment で揃えられることから、msvc では実効サイズに僅かな影響が出る。
+
+      msvc の std::vector<int> は 8 => 4 bytes アライメントと二段階でアロケートを行う。
+
+      このため arena-alignment = 8 とせざるを得ない。
+
+    - [cpprefjp - C++日本語リファレンス - std::max_align_t](https://cpprefjp.github.io/reference/cstddef/max_align_t.html)
+
+      > `alignas`指示子により、`std::max_align_t`のアライメントより大きいサイズのアライメントを指定できるかどうかは、実装依存である。
+
+      alignas と std::max_align_t の因果関係に触れられているソースが上記でしか見つけられず。
+
+      確認できる環境では特に見受けられなかったが、実装制限になるため要調査。
+
+  
+
+  arena-alignment を大きく設定(例えば16bytes)し arena-alignment 以下の任意のアライメントで
+
+  アロケートすると、動的アロケータ(new など)の挙動に近くなる。
+
+  
+
+## References
+
+1. [stack_alloc - Howard Hinnant](https://howardhinnant.github.io/stack_alloc.html)
+2. [cpprefjp - C++日本語リファレンス - std::pmr::memory_resource](https://cpprefjp.github.io/reference/memory_resource/memory_resource.html)
