@@ -10,6 +10,7 @@
 #else
 #include <memory_resource>
 #endif
+#include "alignment.h"
 
 namespace container
 {
@@ -25,36 +26,8 @@ using memory_resource = std::experimental::pmr::memory_resource;
 using memory_resource = std::pmr::memory_resource;
 #endif
 
-template<typename T, typename U>
-std::enable_if_t<std::is_integral_v<U>&& std::is_unsigned_v<U>, bool>
-is_aligned(const T* ptr, U alignment) noexcept
-{
-    return is_aligned(reinterpret_cast<std::uintptr_t>(ptr), alignment);
-}
-
-template<typename T>
-constexpr std::enable_if_t<std::is_integral_v<T>&& std::is_unsigned_v<T>, bool>
-is_aligned(std::uintptr_t address, T alignment) noexcept
-{
-    return (address % alignment) == 0u;
-}
-
-template<typename T>
-constexpr std::enable_if_t<std::is_integral_v<T>&& std::is_unsigned_v<T>, bool>
-is_power_of_two(T x) noexcept
-{
-    return x && !(x & (x - 1));
-}
-
 namespace v1
 {
-
-inline std::uintptr_t align_up(std::uintptr_t raw_address, std::size_t alignment)
-{
-    assert(alignment > 0);
-    --alignment;
-    return (raw_address + alignment) & ~alignment;
-}
 
 template<std::size_t N>
 class stack_resource final : public memory_resource
@@ -83,7 +56,7 @@ public:
 private:
     void* do_allocate(std::size_t bytes, std::size_t alignment) override
     {
-        assert(is_power_of_two(alignment));
+        assert(alignment::is_power_of_2(alignment));
         /*
             addr: raw                  aligend         next
                    |---------|------------|------~------|
@@ -93,7 +66,7 @@ private:
 
         auto raw_addr = reinterpret_cast<std::uintptr_t>(raw_ptr);
 
-        auto aligned_addr = align_up(raw_addr + offset_bytes, alignment);
+        auto aligned_addr = alignment::align_up(raw_addr + offset_bytes, alignment);
 
         auto actual_bytes = bytes + (aligned_addr - raw_addr);
 
@@ -151,12 +124,11 @@ namespace v2
 template<std::size_t N, std::size_t Alignment = alignof(std::max_align_t)>
 class arena final
 {
-    static_assert(is_power_of_two(Alignment), "Alignment must be a power of 2.");
+    static_assert(alignment::is_power_of_2(Alignment), "Alignment must be a power of 2.");
 private:
     static constexpr std::size_t align_up(std::size_t x) noexcept
     {
-        constexpr auto alignment_minus_one = Alignment - 1;
-        return (x + alignment_minus_one) & ~alignment_minus_one;
+        return alignment::align_up(x, Alignment);
     }
 
 public:
@@ -176,7 +148,7 @@ public:
 
     std::byte* allocate(std::size_t bytes, std::size_t alignment)
     {
-        assert(is_power_of_two(alignment));
+        assert(alignment::is_power_of_2(alignment));
         assert(alignment <= Alignment);
 
         auto actual_bytes = align_up(bytes);
@@ -212,7 +184,7 @@ private:
 template<std::size_t N, std::size_t Alignment = alignof(std::max_align_t)>
 class stack_resource final : public memory_resource
 {
-    static_assert(is_power_of_two(Alignment), "Alignment must be a power of 2.");
+    static_assert(alignment::is_power_of_2(Alignment), "Alignment must be a power of 2.");
 public:
     static constexpr std::size_t size() noexcept { return N; }
 
