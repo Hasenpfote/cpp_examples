@@ -21,3 +21,23 @@ Supports C++ 17 or higher.
 | clang    | 3.9.1 or higher. ※`experimental` | 9.0.0 でも`experimental` |
 | msvc     |                                  | 16.1.6 で確認            |
 
+※ `experimental`の clang 実装は最適化されていない
+
+
+
+Files
+
+| Name             | Description                      |
+| ---------------- | -------------------------------- |
+| alignment.h      | アライメント関連のユーティリティ |
+| stack_resource.h | スタックを利用する多相アロケータ |
+
+
+
+Namespace hierarchy
+
+| 1    | 2         | 3    |
+| ---- | --------- | ---- |
+| root | alignment |      |
+|      | container | pmr  |
+
