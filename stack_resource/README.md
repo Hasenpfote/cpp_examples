@@ -47,7 +47,7 @@ Supports C++ 17 or higher.
 
   - Pros
 
-    -  -
+    -  
 
   - Cons
 
@@ -80,7 +80,7 @@ Supports C++ 17 or higher.
 
     - arena-alignment で揃えられることから、msvc では実効サイズに僅かな影響が出る。
 
-      msvc の std::vector<int> は 8 => 4 bytes アライメントと二段階でアロケートを行う。
+      msvc の std::vector\<int\> は 8 => 4 bytes アライメントと二段階でアロケートを行う。
 
       このため arena-alignment = 8 とせざるを得ない。
 
