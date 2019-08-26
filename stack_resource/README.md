@@ -98,11 +98,11 @@ Supports C++ 17 or higher.
     
       C++14以前の動的アロケーションの`overalign`については散見される。
     
-      [Stack Overflow - alignas keyword not respected](https://stackoverflow.com/questions/35365624/alignas-keyword-not-respected)
-      [Stack Overflow - Dynamic aligned memory allocation in C++11](https://stackoverflow.com/questions/6973995/dynamic-aligned-memory-allocation-in-c11/16510895#16510895)
+      [Stack Overflow - alignas keyword not respected](https://stackoverflow.com/questions/35365624/alignas-keyword-not-respected)  
+      [Stack Overflow - Dynamic aligned memory allocation in C++11](https://stackoverflow.com/questions/6973995/dynamic-aligned-memory-allocation-in-c11/16510895#16510895)  
       
-      [expr.new](http://eel.is/c++draft/expr.new)
-      [basic.align](http://eel.is/c++draft/basic.align)
+      [expr.new](http://eel.is/c++draft/expr.new)  
+      [basic.align](http://eel.is/c++draft/basic.align)  
       
       
   
