@@ -91,13 +91,25 @@ Supports C++ 17 or higher.
       alignas と std::max_align_t の因果関係に触れられているソースが上記でしか見つけられず。
 
       確認できる環境では特に見受けられなかったが、実装制限になるため要調査。
-
+    
+      ---
+    
+      [cppreference.com - alignas specifier](https://en.cppreference.com/w/cpp/language/alignas) / [std::max_align_t](https://en.cppreference.com/w/cpp/types/max_align_t) には特に明記なし。
+    
+      C++14以前の動的アロケーションの`overalign`については散見される。
+    
+      [Stack Overflow - alignas keyword not respected](https://stackoverflow.com/questions/35365624/alignas-keyword-not-respected)
+      [Stack Overflow - Dynamic aligned memory allocation in C++11](https://stackoverflow.com/questions/6973995/dynamic-aligned-memory-allocation-in-c11/16510895#16510895)
+      
+      [expr.new](http://eel.is/c++draft/expr.new)
+      [basic.align](http://eel.is/c++draft/basic.align)
+      
+      
   
-
   arena-alignment を大きく設定(例えば16bytes)し arena-alignment 以下の任意のアライメントで
-
+  
   アロケートすると、動的アロケータ(new など)の挙動に近くなる。
-
+  
   
 
 ## References
