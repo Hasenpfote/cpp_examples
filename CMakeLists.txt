@@ -56,6 +56,7 @@ set(examples
     "00_example"
     "circular_buffer"
     "stack_resource"
+    "pubsub_event"
     # Add a new example here.
 )
 
