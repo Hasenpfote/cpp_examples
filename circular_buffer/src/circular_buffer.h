@@ -7,6 +7,9 @@
 #include <iterator>
 #include <utility>
 #include <stdexcept>
+#if defined(__has_include) && __has_include(<memory_resource>)
+#include <memory_resource>
+#endif
 
 namespace container
 {
@@ -812,7 +815,7 @@ circular_buffer<T, Allocator>::unlinearize_pointer(const_pointer ptr) const
     return ptr + offset;
 }
 
-#if (defined(_MSC_VER) && (_MSVC_LANG >= 201703L)) || (__cplusplus >= 201703L)
+#if defined(__has_include) && __has_include(<memory_resource>)
 namespace pmr
 {
 
