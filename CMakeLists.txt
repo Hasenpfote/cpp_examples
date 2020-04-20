@@ -49,6 +49,8 @@ if(${BUILD_TESTS})
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
     add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+
+    enable_testing()
 endif()
 
 ### Examples
