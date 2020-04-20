@@ -76,7 +76,7 @@ public:
     virtual ~BaseEvent() = default;
 
 protected:
-#if (__cplusplus > 201402L) || (defined(_MSC_VER) && (_MSVC_LANG > 201402L))
+#if defined(__cpp_inline_variables) && (__cpp_inline_variables >= 201606L)
     static inline Family family_counter_ = 0;
 #else
     static Family family_counter_;

@@ -1,4 +1,4 @@
-#if (__cplusplus > 201402L) || (defined(_MSC_VER) && (_MSVC_LANG > 201402L))
+#if defined(__cpp_inline_variables) && (__cpp_inline_variables >= 201606L)
 #else
 #include "event.h"
 
