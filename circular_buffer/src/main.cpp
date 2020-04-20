@@ -64,6 +64,7 @@ void test_cb()
 
 void test_custom_allocator()
 {
+#if defined(__has_include) && __has_include(<memory_resource>)
     using value_type = int;
     std::cout << "allocator(custom) ---" << std::endl;
     {
@@ -122,6 +123,7 @@ void test_custom_allocator()
             std::cout << x << " ";
         std::cout << std::endl;
     }
+#endif
 }
 
 int main()
