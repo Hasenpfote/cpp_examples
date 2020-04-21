@@ -25,17 +25,17 @@ public:
         event_bus.unsubscribe<BazEvent>(this);
     }
 
-    void receive(const FooEvent& event)
+    void receive(const FooEvent& /* event */)
     {
         std::cout << __func__ << std::endl;
     }
 
-    void receive(const BarEvent& event)
+    void receive(const BarEvent& /* event */)
     {
         std::cout << __func__ << std::endl;
     }
 
-    void receive(const BazEvent& event)
+    void receive(const BazEvent& /* event */)
     {
         std::cout << __func__ << std::endl;
     }

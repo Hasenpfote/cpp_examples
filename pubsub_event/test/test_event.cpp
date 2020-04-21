@@ -20,12 +20,12 @@ public:
         , bar_counter_(0)
     {}
 
-    void receive(const FooEvent& event)
+    void receive(const FooEvent& /* event */)
     {
         ++foo_counter_;
     }
 
-    void receive(const BarEvent& event)
+    void receive(const BarEvent& /* event */)
     {
         ++bar_counter_;
     }

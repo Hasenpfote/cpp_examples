@@ -146,7 +146,7 @@ public:
         return static_cast<std::size_t>(ptr_ - buffer_);
     }
 
-    std::byte* allocate(std::size_t bytes, std::size_t alignment)
+    std::byte* allocate(std::size_t bytes, [[maybe_unused]] std::size_t alignment)
     {
         assert(alignment::is_power_of_2(alignment));
         assert(alignment <= Alignment);

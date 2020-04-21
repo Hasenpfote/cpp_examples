@@ -22,12 +22,12 @@ void test_cb()
 
         for(auto it = cb.begin(); it != cb.end(); it++);
         for(auto it = cb.cbegin(); it != cb.cend(); it++);
-        for(auto elem : cb);
+        for(auto elem : cb){ (void)elem; }
 
         const auto& c_cb = cb;
         for(auto it = c_cb.begin(); it != c_cb.end(); it++);
         for(auto it = c_cb.cbegin(); it != c_cb.cend(); it++);
-        for(auto elem : c_cb);
+        for(auto elem : c_cb){ (void)elem; }
     }
     {
         circular_buffer<int> cb(5);

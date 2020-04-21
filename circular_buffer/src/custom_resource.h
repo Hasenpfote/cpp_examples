@@ -13,7 +13,7 @@ protected:
         return ::operator new(bytes);
     }
 
-    void do_deallocate(void* p, std::size_t bytes, [[maybe_unused]] std::size_t alignment) override
+    void do_deallocate(void* p, [[maybe_unused]] std::size_t bytes, [[maybe_unused]] std::size_t alignment) override
     {
         std::cout << __func__ << std::endl;
         ::operator delete(p);
