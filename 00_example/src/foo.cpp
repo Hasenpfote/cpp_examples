@@ -7,7 +7,8 @@ Foo::Foo(int number)
 
 bool Foo::IsOdd() const noexcept
 {
-    return (number_ % 2) == 0;  // bug
+    //return (number_ % 2) == 0;  // bug
+    return (number_ % 2) != 0;
 }
 
 bool Foo::IsEven() const noexcept
