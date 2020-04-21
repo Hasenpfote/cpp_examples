@@ -8,18 +8,18 @@
 namespace
 {
 
-template<typename T, typename U>
-std::enable_if_t<std::is_integral_v<U>&& std::is_unsigned_v<U>, bool>
-is_aligned(const T* ptr, U alignment)
-{
-    return is_aligned(reinterpret_cast<std::uintptr_t>(ptr), alignment);
-}
-
 template<typename T>
 constexpr std::enable_if_t<std::is_integral_v<T>&& std::is_unsigned_v<T>, bool>
 is_aligned(std::uintptr_t address, T alignment)
 {
     return (address % alignment) == 0u;
+}
+
+template<typename T, typename U>
+std::enable_if_t<std::is_integral_v<U>&& std::is_unsigned_v<U>, bool>
+is_aligned(const T* ptr, U alignment)
+{
+    return is_aligned(reinterpret_cast<std::uintptr_t>(ptr), alignment);
 }
 
 class StackResourceV2Test : public ::testing::Test {};
