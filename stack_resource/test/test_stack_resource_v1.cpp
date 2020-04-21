@@ -4,6 +4,14 @@
 #include <gtest/gtest.h>
 #include <gtest/gtest-spi.h>
 #include <stack_resource.h>
+#if defined(__clang__)
+#include <experimental/vector>
+template<typename T>
+using pmr_vector = std::experimental::pmr::vector<T>;
+#else
+template<typename T>
+using pmr_vector = std::pmr::vector<T>;
+#endif
 
 namespace
 {
@@ -47,7 +55,7 @@ TEST_F(StackResourceV1Test, is_aligned)
     using value_type = std::int32_t;
 
     stack_resource<100> sr;
-    std::pmr::vector<value_type> v(3, &sr);
+    pmr_vector<value_type> v(3, &sr);
 
     EXPECT_EQ(true, is_aligned(v.data(), alignof(value_type)));
 }
@@ -61,7 +69,7 @@ TEST_F(StackResourceV1Test, out_of_memory)
 
     EXPECT_THROW(
         {
-            std::pmr::vector<value_type> v(3, &sr);
+            pmr_vector<value_type> v(3, &sr);
         }, std::bad_alloc);
 }
 
@@ -71,7 +79,7 @@ TEST_F(StackResourceV1Test, normally_behavior)
     using value_type = std::int32_t;
     {
         stack_resource<100> sr;
-        std::pmr::vector<value_type> v(10, &sr);
+        pmr_vector<value_type> v(10, &sr);
         auto size = v.size();
         for(auto i = decltype(size)(0); i < size; i++)
         {
