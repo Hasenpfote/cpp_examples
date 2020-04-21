@@ -15,6 +15,7 @@ include_directories(${TARGET_SRC_DIR})
 
 #
 set(ALL_FILES
+    ${TARGET_SRC_DIR}/event.cpp
     test_event.cpp
     # Add a new file here.
     )
