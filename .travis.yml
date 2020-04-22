@@ -1,0 +1,55 @@
+language: cpp
+
+matrix:
+  include:
+    # gcc
+    - os: linux
+      dist: bionic
+      sudo: required
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+             - ubuntu-toolchain-r-test
+          packages:
+             - cmake-data
+             - cmake
+             - gcc-9
+             - g++-9
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+    # clang
+    - os: linux
+      dist: bionic
+      sudo: required
+      compiler: clang
+      addons:
+        apt:
+          sources:
+             - ubuntu-toolchain-r-test
+             - llvm-toolchain-bionic-9
+          packages:
+             - cmake-data
+             - cmake
+             - clang-9
+             - clang++-9
+      env:
+        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+install:
+  - echo ${CC}
+  - echo ${CXX}
+  - ${CXX} --version
+  - cmake --version
+
+before_script:
+
+script:
+  - install -d build
+  - cd build
+  - cmake -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} -DBUILD_TESTS=ON ..
+  - make VERBOSE=1
+  - ctest -V
