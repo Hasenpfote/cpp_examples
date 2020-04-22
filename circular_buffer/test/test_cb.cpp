@@ -289,9 +289,9 @@ TEST_F(CBTest, clear)
     EXPECT_NONFATAL_FAILURE(
         EXPECT_DEATH(
             {
-                circular_buffer<int> cb(3);
-                cb.clear();
-                cb.push_back(1);
+                circular_buffer<int> cb2(3);
+                cb2.clear();
+                cb2.push_back(1);
             },
             ""),
         "");
