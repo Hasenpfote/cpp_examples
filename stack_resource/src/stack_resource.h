@@ -73,9 +73,14 @@ private:
         if((ptr_ + actual_bytes) > std::end(buffer_))
             throw std::bad_alloc();
         ptr_ += actual_bytes;
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
         std::ptrdiff_t offset_addr = aligned_addr - offset_bytes;
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
         auto pp_offset_addr = reinterpret_cast<void**>(offset_addr);
         *pp_offset_addr = raw_ptr;
 
@@ -90,9 +95,14 @@ private:
         assert(pointer_in_buffer(aligned_ptr));
 
         auto aligned_addr = reinterpret_cast<std::uintptr_t>(p);
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
         std::ptrdiff_t offset_addr = aligned_addr - offset_bytes;
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
         auto pp_offset_addr = reinterpret_cast<void**>(offset_addr);
         auto raw_ptr = static_cast<std::byte*>(*pp_offset_addr);
 

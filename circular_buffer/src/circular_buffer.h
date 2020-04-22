@@ -642,9 +642,14 @@ void circular_buffer<T, Allocator>::linearize()
 {
     if(is_linearized())
         return;
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
     std::rotate(array_.begin(), array_.begin() + head_, array_.end());
-
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
     head_ = 0;
     tail_ = (is_full())? 0 : contents_size_;
 }
