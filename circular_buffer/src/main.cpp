@@ -3,6 +3,9 @@
 #include "custom_allocator.h"
 #include "custom_resource.h"
 
+namespace
+{
+
 using namespace container;
 
 template<typename T>
@@ -126,12 +129,11 @@ void test_custom_allocator()
 #endif
 }
 
+}   // namespace
+
 int main()
 {
-#if 0
     test_cb();
-#else
     test_custom_allocator();
-#endif
     return 0;
 }

@@ -10,6 +10,9 @@
 #include <iterator>
 #include "stack_resource.h"
 
+namespace
+{
+
 template<typename F, typename... Args>
 auto measure(F&& f, Args&& ... args)
 {
@@ -63,6 +66,8 @@ void test_pmr_vector_with_sr_v2(std::size_t num_trials)
             v[j] = static_cast<int>(j);
     }
 }
+
+}   // namespace
 
 int main()
 {
