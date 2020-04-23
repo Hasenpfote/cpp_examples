@@ -19,26 +19,39 @@ abs(T x)
     return x < T(0.0) ? -x : x;
 }
 
-template<typename T>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-constexpr
+#if ((defined(_MSVC_LANG) && _MSVC_LANG < 201402L) || __cplusplus < 201402L)
+template <class T>
+constexpr const T&
+max(const T& a, const T& b)
+{
+    return a < b ? b : a;
+}
 #endif
-std::enable_if_t<std::is_floating_point<T>::value, bool>
+
+template<typename T>
+constexpr typename std::enable_if<std::is_floating_point<T>::value, bool>::type
 are_close(T lhs, T rhs, T rel_tolerance, T abs_tolerance)
 {
+#if (__cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L))
     return detail::abs(lhs - rhs)
         <= std::max(abs_tolerance, rel_tolerance * std::max(detail::abs(lhs), detail::abs(rhs)));
+#else
+    return detail::abs(lhs - rhs)
+        <= max(abs_tolerance, rel_tolerance * max(detail::abs(lhs), detail::abs(rhs)));
+#endif
 }
 
 template<typename T>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-constexpr
-#endif
-std::enable_if_t<std::is_floating_point<T>::value, bool>
+constexpr typename std::enable_if<std::is_floating_point<T>::value, bool>::type
 are_close(T lhs, T rhs, T tolerance)
 {
+#if (__cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L))
     return detail::abs(lhs - rhs)
         <= tolerance * std::max(T(1.0), std::max(detail::abs(lhs), detail::abs(rhs)));
+#else
+    return detail::abs(lhs - rhs)
+        <= tolerance * max(T(1.0), max(detail::abs(lhs), detail::abs(rhs)));
+#endif
 }
 
 }   // namespace detail
@@ -110,22 +123,13 @@ public:
      */
     bool is_nan() const;
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-    constexpr
-#endif
-    bool is_unit(T tolerance) const;
+    constexpr bool is_unit(T tolerance) const;
 
 /* Comparison functions */
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-    constexpr
-#endif
-    bool is_close_to(const Dual& other, T rel_tolerance, T abs_tolerance) const;
+    constexpr bool is_close_to(const Dual& other, T rel_tolerance, T abs_tolerance) const;
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-    constexpr
-#endif
-    bool is_close_to(const Dual& other, T tolerance) const;
+    constexpr bool is_close_to(const Dual& other, T tolerance) const;
 
 private:
     T real_;
@@ -228,10 +232,7 @@ Dual<T>::is_nan() const
 }
 
 template<typename T>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-constexpr
-#endif
-bool
+constexpr bool
 Dual<T>::is_unit(T tolerance) const
 {
     return detail::are_close(real_ * real_, T(1.0), tolerance);
@@ -240,20 +241,16 @@ Dual<T>::is_unit(T tolerance) const
 /* Comparison functions */
 
 template<typename T>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-constexpr
-#endif
-bool Dual<T>::is_close_to(const Dual<T>& other, T rel_tolerance, T abs_tolerance) const
+constexpr bool
+Dual<T>::is_close_to(const Dual<T>& other, T rel_tolerance, T abs_tolerance) const
 {
     return detail::are_close(real_, other.real(), rel_tolerance, abs_tolerance)
         && detail::are_close(dual_, other.dual(), rel_tolerance, abs_tolerance);
 }
 
 template<typename T>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201402L) || __cplusplus >= 201402L)
-constexpr
-#endif
-bool Dual<T>::is_close_to(const Dual<T>& other, T tolerance) const
+constexpr bool
+Dual<T>::is_close_to(const Dual<T>& other, T tolerance) const
 {
     return detail::are_close(real_, other.real(), tolerance)
         && detail::are_close(dual_, other.dual(), tolerance);

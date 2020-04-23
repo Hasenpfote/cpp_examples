@@ -48,7 +48,6 @@ void constexpr_test()
         static_assert(Dual(1.0, 1.0).is_pure(tolerance) == false, "");
     }
     // is_unit
-#if (__cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L))
     {
         constexpr auto tolerance = nlimits::epsilon();
         static_assert(Dual(0.0, 0.0).is_unit(tolerance) == false, "");
@@ -56,9 +55,7 @@ void constexpr_test()
         static_assert(Dual(0.0, 1.0).is_unit(tolerance) == false, "");
         static_assert(Dual(1.0, 1.0).is_unit(tolerance) == true, "");
     }
-#endif
     // is_close_to
-#if (__cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L))
     {
         constexpr auto rel_tolerance = 1e-5;
         constexpr auto abs_tolerance = 1e-8;
@@ -66,21 +63,15 @@ void constexpr_test()
         static_assert(w.is_close_to(Dual(3.0, 4.0), rel_tolerance, abs_tolerance) == true, "");
         static_assert(z.is_close_to(w, rel_tolerance, abs_tolerance) == false, "");
     }
-#endif
     // Unary plus/minus
     {
         constexpr auto tolerance = nlimits::epsilon();
         constexpr auto d1 = +z;
         constexpr auto d2 = -z;
-#if (__cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L))
         static_assert(dual::detail::are_close(z.real(), d1.real(), tolerance) == true, "");
         static_assert(dual::detail::are_close(z.dual(), d1.dual(), tolerance) == true, "");
         static_assert(dual::detail::are_close(-z.real(), d2.real(), tolerance) == true, "");
         static_assert(dual::detail::are_close(-z.dual(), d2.dual(), tolerance) == true, "");
-#else
-        (void)d1;
-        (void)d2;
-#endif
     }
     // Addition
     {
