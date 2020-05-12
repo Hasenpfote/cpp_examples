@@ -16,8 +16,7 @@ include_directories(${TARGET_SRC_DIR})
 #
 set(ALL_FILES
     # ${TARGET_SRC_DIR}/dual.cpp
-    test_dualf.cpp
-    test_duald.cpp
+    test_dual.cpp
     test_constexpr.cpp
     # Add a new file here.
     )
