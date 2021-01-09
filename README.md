@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Hasenpfote/cpp_examples.svg?branch=master)](https://travis-ci.org/Hasenpfote/cpp_examples)
+[![Build Status](https://travis-ci.com/Hasenpfote/cpp_examples.svg?branch=master)](https://travis-ci.com/Hasenpfote/cpp_examples)
 
 # cpp_examples
 
